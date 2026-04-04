@@ -29,6 +29,10 @@ exports.registrarUsuario = async (req, res) => {
     res.json({ message: 'Usuario registrado correctamente 🎉' });
 
   } catch (error) {
+      if (error.code === 11000) {
+    return res.status(400).json({ message: 'El email ya está registrado' });
+  }
+
     res.status(500).json({ error: error.message });
   }
 };
