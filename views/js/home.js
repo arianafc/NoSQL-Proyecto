@@ -2,6 +2,7 @@ const APIRegistro = 'http://localhost:3000/api/usuarios/';
 
 $(document).ready(function() {
 
+ 
 $("#formRegistro").submit(function(event) {
     event.preventDefault();
 
@@ -99,5 +100,13 @@ $("#formLogin").submit(function(event) {
     });
 
 });
+
+const usuario = JSON.parse(localStorage.getItem('usuario'));
+console.log('Usuario en localStorage:', usuario);
+  if (usuario) {
+    $("#labelNombre").text(usuario.nombre);
+    $("#labelRol").text("Rol: " + usuario.rol);
+  }
+
 
 });

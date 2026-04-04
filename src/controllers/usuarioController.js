@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 exports.registrarUsuario = async (req, res) => {
   try {
-    const { nombre, email, password, telefono, cedula } = req.body;
+    const { nombre, email, password, telefono, cedula, rol } = req.body;
 
     if (!nombre || !email || !password || !telefono || !cedula) {
       return res.status(400).json({ message: 'Todos los campos son obligatorios' });
@@ -19,6 +19,7 @@ exports.registrarUsuario = async (req, res) => {
       cedula,
       password: hashedPassword,
       telefono,
+      rol: 'usuario',
       estado: true
     });
 
@@ -53,7 +54,7 @@ exports.loginUsuario = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }   
-    res.json({ message: 'Bienvenido a FaunaLink', usuario: { nombre: usuario.nombre, email: usuario.email, id: usuario._id } }); 
+    res.json({ message: 'Bienvenido a FaunaLink', usuario: { nombre: usuario.nombre, email: usuario.email, id: usuario._id, rol: usuario.rol } }); 
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
