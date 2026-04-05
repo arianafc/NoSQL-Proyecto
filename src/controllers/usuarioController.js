@@ -54,7 +54,7 @@ exports.loginUsuario = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }   
-    res.json({ message: 'Bienvenido a FaunaLink', usuario: { nombre: usuario.nombre, email: usuario.email, id: usuario._id, rol: usuario.rol } }); 
+    res.json({ message: 'Bienvenido a FaunaLink', usuario: { nombre: usuario.nombre, email: usuario.email, id: usuario._id, rol: usuario.rol, cedula: usuario.cedula, telefono: usuario.telefono } }); 
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

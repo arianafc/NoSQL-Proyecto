@@ -1,7 +1,30 @@
 const APIRegistro = 'http://localhost:3000/api/usuarios/';
 
+
+
 $(document).ready(function() {
 
+$('#cerrarSesion').click(function(e) {
+  e.preventDefault();
+
+  Swal.fire({
+    title: '¿Cerrar sesión?',
+    text: 'Tu sesión se cerrará',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, cerrar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      
+      // 🔥 borrar sesión
+      localStorage.removeItem('usuario');
+
+      // redirigir
+      window.location.href = '/login';
+    }
+  });
+});
  
 $("#formRegistro").submit(function(event) {
     event.preventDefault();
@@ -50,7 +73,7 @@ $("#formRegistro").submit(function(event) {
         success: function(response) {
             Swal.fire('¡Registro exitoso!', response.message, 'success')
             .then(() => {
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             });
         },
 
@@ -88,7 +111,7 @@ $("#formLogin").submit(function(event) {
             console.log('Usuario logueado:', response.usuario);
             Swal.fire('¡Login exitoso!', response.message, 'success')
             .then(() => {
-                window.location.href = 'index.html';
+                window.location.href = '/index';
             });
         },
         error: function(err) {
@@ -102,11 +125,11 @@ $("#formLogin").submit(function(event) {
 });
 
 const usuario = JSON.parse(localStorage.getItem('usuario'));
+
 console.log('Usuario en localStorage:', usuario);
   if (usuario) {
     $("#labelNombre").text(usuario.nombre);
     $("#labelRol").text("Rol: " + usuario.rol);
-  }
-
+  } 
 
 });
