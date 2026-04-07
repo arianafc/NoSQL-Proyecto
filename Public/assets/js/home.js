@@ -111,8 +111,20 @@ $("#formLogin").submit(function(event) {
             console.log('Usuario logueado:', response.usuario);
             Swal.fire('¡Login exitoso!', response.message, 'success')
             .then(() => {
-                window.location.href = '/index';
-            });
+
+                const usuario = response.usuario;
+
+                // 🔥 guardamos sesión
+                localStorage.setItem('usuario', JSON.stringify(usuario));
+
+                // 🔥 REDIRECCIÓN POR ROL
+                if (usuario.rol === 'admin') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/index';
+                }
+
+                });
         },
         error: function(err) {
             Swal.fire('Error', err.responseJSON?.message || 'Error en el servidor', 'error');
