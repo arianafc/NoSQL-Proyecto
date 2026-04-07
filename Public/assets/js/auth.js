@@ -5,7 +5,7 @@ function verificarSesion() {
   if (!usuario) {
     Swal.fire('Error', 'No ha iniciado sesión', 'error')
     .then(() => {
-      window.location.href = '/login';
+      window.location.href = '/';
     });
     return false;
   }

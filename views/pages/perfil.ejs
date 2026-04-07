@@ -95,33 +95,7 @@
                         
                           <div class="mb-3 col-md-12">
                             <label class="form-label" for="country">País</label>
-                            <select id="country" class="select2 form-select">
-                              <option value="">Seleccionar</option>
-                              <option value="Costa Rica">Costa Rica</option>
-                              <option value="Bangladesh">Bangladesh</option>
-                              <option value="Belarus">Belarus</option>
-                              <option value="Brazil">Brazil</option>
-                              <option value="Canada">Canada</option>
-                              <option value="China">China</option>
-                              <option value="France">France</option>
-                              <option value="Germany">Germany</option>
-                              <option value="India">India</option>
-                              <option value="Indonesia">Indonesia</option>
-                              <option value="Israel">Israel</option>
-                              <option value="Italy">Italy</option>
-                              <option value="Japan">Japan</option>
-                              <option value="Korea">Korea, Republic of</option>
-                              <option value="Mexico">Mexico</option>
-                              <option value="Philippines">Philippines</option>
-                              <option value="Russia">Russian Federation</option>
-                              <option value="South Africa">South Africa</option>
-                              <option value="Thailand">Thailand</option>
-                              <option value="Turkey">Turkey</option>
-                              <option value="Ukraine">Ukraine</option>
-                              <option value="United Arab Emirates">United Arab Emirates</option>
-                              <option value="United Kingdom">United Kingdom</option>
-                              <option value="United States">United States</option>
-                            </select>
+                             <input class="form-control" type="text" id="pais" name="state" placeholder="País" />
                           </div>
                          
                       
@@ -155,17 +129,40 @@
                             >Quiero ser voluntario</label
                           >
                         </div>
-                      <form id="formActualizarVoluntario" class="d-none">
-                          <div class="mb-3 col-md-6">
-                            <label for="address" class="form-label">Indica tus habilidades</label>
-                            <input type="text" class="form-control" id="habilidadesVoluntario" name="address" placeholder="Habilidades" required/>
-                          </div>
-                          <div class="mb-3 col-md-6">
-                            <label for="state" class="form-label">Indica tu disponibilidad</label>
-                            <input class="form-control" type="text" id="disponibilidadVoluntario" name="state" placeholder="Disponibilidad" required />
-                          </div>
-                        <button type="submit" class="btn btn-danger deactivate-account">Quiero ser voluntario</button>
-                      </form>
+                     <form id="formActualizarVoluntario" class="d-none">
+
+  <div class="mb-3">
+    <label class="form-label">Selecciona tus habilidades</label>
+
+    <div class="form-check">
+      <input class="form-check-input habilidad" type="checkbox" value="Rescate">
+      <label class="form-check-label">Rescate de animales</label>
+    </div>
+
+    <div class="form-check">
+      <input class="form-check-input habilidad" type="checkbox" value="Veterinaria">
+      <label class="form-check-label">Apoyo veterinario</label>
+    </div>
+
+    <div class="form-check">
+      <input class="form-check-input habilidad" type="checkbox" value="Alimentación">
+      <label class="form-check-label">Alimentación</label>
+    </div>
+
+    <div class="form-check">
+      <input class="form-check-input habilidad" type="checkbox" value="Limpieza">
+      <label class="form-check-label">Limpieza</label>
+    </div>
+
+  </div>
+
+  <div class="mb-3 col-md-6">
+    <label class="form-label">Disponibilidad</label>
+    <input class="form-control" id="disponibilidadVoluntario" placeholder="Disponibilidad" required />
+  </div>
+
+  <button type="submit" class="btn btn-danger">Quiero ser voluntario</button>
+</form>
                     </div>
                   </div>
                 </div>

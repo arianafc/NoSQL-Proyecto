@@ -21,7 +21,7 @@ $('#cerrarSesion').click(function(e) {
       localStorage.removeItem('usuario');
 
       // redirigir
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   });
 });

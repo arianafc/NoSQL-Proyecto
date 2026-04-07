@@ -1,4 +1,5 @@
 const connectDB = require('../config/db');
+const { ObjectId } = require('mongodb');
 const Usuario = require('../models/usuarioModel');
 const bcrypt = require('bcrypt');
 
@@ -58,4 +59,28 @@ exports.loginUsuario = async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
+};
+
+exports.serVoluntario = async (req, res) => {
+  try {
+    const { userId, habilidades, disponibilidad } = req.body;
+
+    const db = await connectDB();
+
+    await db.collection('usuarios').updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          voluntario: true,
+          habilidades: habilidades, 
+          disponibilidad: disponibilidad
+        }
+      }
+    );
+
+    res.json({ message: 'Usuario actualizado como voluntario' });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
