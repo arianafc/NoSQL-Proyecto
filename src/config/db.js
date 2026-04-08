@@ -18,7 +18,7 @@ const connectDB = async () => {
       await client.connect();
       db = client.db("FaunaLink"); 
 
-      await db.collection('usuarios').createIndex(
+       await db.collection('usuarios').createIndex(
       { email: 1 },
       { unique: true }
     );

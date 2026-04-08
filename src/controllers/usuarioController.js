@@ -4,7 +4,7 @@ const Usuario = require('../models/usuarioModel');
 const bcrypt = require('bcrypt');
 
 
-// 🔥 REGISTRAR USUARIO
+// REGISTRAR USUARIO
 exports.registrarUsuario = async (req, res) => {
   try {
     const { nombre, email, password, telefono, cedula } = req.body;
@@ -42,7 +42,7 @@ exports.registrarUsuario = async (req, res) => {
 };
 
 
-// 🔥 LOGIN
+// LOGIN
 exports.loginUsuario = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -78,7 +78,10 @@ exports.loginUsuario = async (req, res) => {
         email: usuario.email,
         rol: usuario.rol,
         cedula: usuario.cedula,
-        telefono: usuario.telefono
+        telefono: usuario.telefono,
+        voluntario: usuario.voluntario || false,
+        habilidades: usuario.habilidades || [],
+        disponibilidad: usuario.disponibilidad || ''
       }
     });
 
@@ -88,7 +91,7 @@ exports.loginUsuario = async (req, res) => {
 };
 
 
-// 🔥 SER VOLUNTARIO
+// SER VOLUNTARIO
 exports.serVoluntario = async (req, res) => {
   try {
     const { userId, habilidades, disponibilidad } = req.body;
@@ -130,7 +133,7 @@ exports.getUsuarios = async (req, res) => {
 };
 
 
-// 🔥 CAMBIAR ROL
+// CAMBIAR ROL
 exports.updateRol = async (req, res) => {
   try {
     const db = await connectDB();
@@ -160,7 +163,7 @@ exports.updateRol = async (req, res) => {
 };
 
 
-// 🔥 CAMBIAR ESTADO
+// CAMBIAR ESTADO
 exports.updateEstado = async (req, res) => {
   try {
     const db = await connectDB();
@@ -185,4 +188,33 @@ exports.updateEstado = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Error actualizando estado' });
   }
+};
+
+
+exports.actualizarPerfil = async (req, res) => {
+  try {
+    const { userId, nombre, email, telefono, cedula, direccion, provincia, pais } = req.body;
+
+    const db = await connectDB();
+
+    await db.collection('usuarios').updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          nombre,
+          email,
+          telefono,
+          cedula,
+          direccion,
+          provincia,
+          pais
+        }
+      }
+    );  
+
+    res.json({ message: 'Perfil actualizado correctamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error actualizando perfil' });
+  } 
 };

@@ -7,7 +7,7 @@ const usuarioController = require('../controllers/usuarioController');
 router.post('/registro', usuarioController.registrarUsuario);
 router.post('/login', usuarioController.loginUsuario);
 router.put('/voluntario', usuarioController.serVoluntario);
-
+router.put('/perfil/', usuarioController.actualizarPerfil);
 
 //OBTENER Y EDITAR USUARIOS DESDE ADMIN
 
