@@ -25,6 +25,10 @@ app.get('/', (req, res) => {
   res.render('pages/login', { layout: false });
 });
 
+app.get('/reportes', (req, res) => {
+  res.render('pages/reportes-usuario');
+});
+
 app.get('/perfil', (req, res) => {
   res.render('pages/perfil');
 });
