@@ -64,6 +64,12 @@ app.get('/admin/usuarios', (req, res) => {
   res.render('pages/admin-usuarios');
 });
 
+app.get('/admin/reportes', (req, res) => {
+  res.render('pages/admin-reportes');
+});
+
+
+
 //  DB
 connectDB()
   .then(() => console.log(' Conectado a MongoDB Atlas'))

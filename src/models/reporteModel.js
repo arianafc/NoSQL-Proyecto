@@ -5,7 +5,7 @@ class Reporte {
     this.ubicacion = ubicacion;
     this.urgencia = urgencia || 'media';
     this.provincia = provincia;
-    this.asignado = asignado || 'FaunaLink';
+    this.asignado = asignado || null ;
     this.evidencias = evidencias || [];
 
     this.estado = 'Pendiente';

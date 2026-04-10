@@ -117,3 +117,20 @@ exports.eliminarOrganizacion = async (req, res) => {
     });
   }
 };
+
+exports.obtenerOrganizaciones = async (req, res) => {
+  try {
+    const db = await connectDB();
+    
+    const organizaciones = await db
+      .collection("organizaciones")
+      .find({ verificado: true })
+      .toArray();
+
+    res.json(organizaciones);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};

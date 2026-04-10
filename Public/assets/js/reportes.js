@@ -1,4 +1,23 @@
 let evidenciasAEliminar = [];
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+function getEstadoBadge(estado) {
+  switch (estado) {
+    case "Pendiente":
+      return '<span class="badge bg-warning">Pendiente</span>';
+    case "En Revision":
+      return '<span class="badge bg-info">En Revisión</span>';
+    case "Resuelto":
+      return '<span class="badge bg-success">Resuelto</span>';
+    case "Transferido":
+      return '<span class="badge bg-primary">Transferido</span>';
+    case "Cancelado":
+      return '<span class="badge bg-danger">Cancelado</span>';
+    default:
+      return `<span class="badge bg-secondary">${estado}</span>`;
+  }
+}
+
 
 function cargarMisReportes() {
 
@@ -31,9 +50,9 @@ function cargarMisReportes() {
 
       reportes.forEach(rep => {
 
-        let urgenciaBadge = rep.urgencia === 'alta'
+        let urgenciaBadge = rep.urgencia === 'Alta'
           ? '<span class="badge bg-danger">Alta</span>'
-          : rep.urgencia === 'media'
+          : rep.urgencia === 'Media'
           ? '<span class="badge bg-warning">Media</span>'
           : '<span class="badge bg-success">Baja</span>';
 
@@ -50,8 +69,8 @@ function cargarMisReportes() {
             <td>${rep.descripcion}</td>
             <td>${rep.ubicacion}</td>
             <td>${urgenciaBadge}</td>
-            <td>${rep.asignado || 'Sin asignar'}</td>
-            <td>${rep.estado || 'Pendiente'}</td>
+            <td>${rep.organizacion?.nombre ?? 'Sin asignar'}</td>
+             <td>${getEstadoBadge(rep.estado)}</td>
             <td>${new Date(rep.fecha).toLocaleDateString("es-CR")}</td>
             <td>${evidenciasHTML}</td>
             <td>
@@ -74,11 +93,302 @@ function cargarMisReportes() {
   });
 }
 
-$(document).ready(function () {
-    
-    cargarMisReportes();
+function cargarReportes() {
 
-    $(document).on("click", "#btnCancelarReporte", function () {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario) {
+    Swal.fire("Error", "Debe iniciar sesión", "error");
+    window.location.href = "/login";
+    return;
+  }
+
+  $.ajax({
+    url: `/api/reportes/`, 
+    method: "GET",
+
+    success: function (reportes) {
+      const tabla = $("#tablaReportes");
+      tabla.html("");
+
+      if (!reportes.length) {
+        tabla.append(`
+          <tr>
+            <td colspan="7" class="text-center">No tienes reportes 🐾</td>
+          </tr>
+        `);
+        return;
+      }
+
+      reportes.forEach(rep => {
+
+        let urgenciaBadge = rep.urgencia === 'Alta'
+          ? '<span class="badge bg-danger">Alta</span>'
+          : rep.urgencia === 'Media'
+          ? '<span class="badge bg-warning">Media</span>'
+          : '<span class="badge bg-success">Baja</span>';
+
+
+
+        let evidenciasHTML = '';
+
+        if (rep.evidencias?.length) {
+          evidenciasHTML = 'Evidencias Adjuntas: ' + rep.evidencias.length;
+        } else {
+          evidenciasHTML = 'Sin evidencia';
+        }
+
+        const fila = `
+          <tr>
+            <td>${rep.usuario.nombre}</td>
+            <td>${rep.descripcion}</td>
+            <td>${rep.ubicacion}</td>
+            <td>${urgenciaBadge}</td>
+           <td>${rep.organizacion?.nombre ?? 'Sin asignar'}</td>
+            <td>${getEstadoBadge(rep.estado)}</td>
+            <td>${new Date(rep.fecha).toLocaleDateString("es-CR")}</td>
+            <td>${evidenciasHTML}</td>
+           <td>
+  <button 
+    class="btn btn-sm btn-info btnVerAdmin col-md-12 mb-2" 
+    data-id="${rep._id}" 
+    data-contacto="${rep.usuario.correo}" 
+    data-telefono="${rep.usuario.telefono}">
+    Ver
+  </button>
+
+  <button 
+    class="btn btn-sm btn-warning btnAsignar col-md-12 mb-2" 
+    data-id="${rep._id}">
+    Asignar
+  </button>
+
+  <button 
+    class="btn btn-sm btn-success btnAgregarNotas col-md-12 mb-2" 
+    data-id="${rep._id}">
+    Notas
+  </button>
+</td>
+
+          </tr>
+        `;
+
+        tabla.append(fila);
+      });
+    },
+
+    error: function (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudieron cargar los reportes", "error");
+    }
+  });
+}
+
+function verNotas(idReporte) {
+  $.get(`/api/reportes/notas/` + idReporte, function (notas) {
+
+    let html = `
+      <div style="
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 5px;
+      ">
+    `;
+
+    if (notas.length === 0) {
+      html += `
+        <p class="text-muted text-center">
+          No hay notas registradas
+        </p>
+      `;
+    } else {
+      notas.forEach(nota => {
+        html += `
+          <div style="
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: left;
+          ">
+            <p style="
+              margin-bottom: 8px;
+              font-size: 14px;
+              color: #333;
+            ">
+              ${nota.mensaje}
+            </p>
+
+            <div style="
+              font-size: 12px;
+              color: #777;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            ">
+              <span>
+                <strong>${nota.autor.nombre}</strong>
+              </span>
+              <span>
+                ${new Date(nota.fecha).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    html += `</div>`;
+
+    Swal.fire({
+      title: "📝 Notas del reporte",
+      html: html,
+      width: "650px",
+      confirmButtonText: "Cerrar",
+      focusConfirm: false
+    });
+  })
+  .fail(function (err) {
+    Swal.fire(
+      "Error",
+      err.responseJSON?.error || "No se pudieron cargar las notas",
+      "error"
+    );
+  });
+}
+
+function renderOrganizaciones(organizaciones) {
+  let html = "";
+
+  if (!organizaciones || organizaciones.length === 0) {
+    html = `
+      <div class="col-12 text-center text-muted">
+        No se encontraron organizaciones
+      </div>
+    `;
+  } else {
+    organizaciones.forEach(org => {
+      html += `
+        <div class="col-md-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex flex-column">
+
+              <h6 class="card-title fw-bold mb-1">
+                ${org.nombre}
+              </h6>
+
+              <p class="card-text small text-muted mb-2">
+                ${org.descripcion || "Sin descripción"}
+              </p>
+
+              <p class="small mb-2">
+                📍 ${org.direccion}
+              </p>
+
+              <button
+                class="btn btn-success btn-sm mt-auto btnConfirmarAsignacion"
+                data-id-org="${org._id}"
+                >
+                Asignar
+              </button>
+
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  $("#contenedorOrganizaciones").html(html);
+}
+
+$(document).ready(function () {
+
+
+  if(usuario.rol === "usuario") {
+      cargarMisReportes();
+  } else if (usuario.rol === "admin") {
+      cargarReportes();
+  }
+    
+
+ $(document).on("click", ".btnAsignar", function () {
+  
+  const idReporte = $(this).data("id");
+  $("#modalAsignarOrganizacion").data("id-reporte", idReporte);
+  
+  $("#contenedorOrganizaciones").html(`
+    <div class="text-center text-muted">
+      Cargando organizaciones sugeridas...
+    </div>
+  `);
+
+  $("#modalAsignarOrganizacion").modal("show");
+
+  $.get(`/api/reportes/organizaciones/${idReporte}`, function (response) {
+    renderOrganizaciones(response.sugeridas);
+  });
+});
+
+$(document).on("click", "#obtenerTodasOrganizaciones", function () {
+
+
+  $("#contenedorOrganizaciones").html(`
+    <div class="text-center text-muted">
+      Cargando todas las organizaciones...
+    </div>
+  `);
+
+  $.get(`/admin/organizacionesAsignar`, function (organizaciones) {
+   
+    renderOrganizaciones(organizaciones);
+  });
+});
+
+$(document).on("click", ".btnConfirmarAsignacion", function () {
+
+  const idReporte = $("#modalAsignarOrganizacion").data("id-reporte")
+  const idOrganizacion = $(this).data("id-org");
+
+  $.ajax({
+  url: "/api/reportes/asignarOrganizacion",
+  method: "POST",
+  contentType: "application/json",
+  data: JSON.stringify({
+    idReporte,
+    idOrganizacion
+  }),
+  success: function () {
+    $("#modalAsignarOrganizacion").modal("hide");
+
+    Swal.fire({
+      icon: "success",
+      title: "Éxito",
+      text: "Organización asignada correctamente"
+    }).then(() => {
+      location.reload();
+    });
+  },
+  error: function () {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "No se pudo asignar la organización"
+    });
+  }
+});
+ 
+});
+
+$("#btnVerNotas").click(function(){
+  const idReporte = $(this).data("id");
+  $("#modalDetalleReporte").modal("hide");
+  verNotas(idReporte);
+});
+
+$(document).on("click", "#btnCancelarReporte", function () {
 
 $("#modalDetalleReporte").modal("hide");
   const id = $(this).data("id");
@@ -99,10 +409,10 @@ $("#modalDetalleReporte").modal("hide");
           $("#modalDetalleReporte").modal("hide");
           cargarMisReportes();
           $("#detalleDescripcion").text($("#inputDescripcion").attr("value"));
-  $("#detalleUbicacion").text($("#inputUbicacion").attr("value"));
-  $("#detalleProvincia").text($("#inputProvincia").val());
-  $("#detalleUrgencia").text($("#inputUrgencia").attr("value"));
-   $("#btnEditarReporte").addClass("d-none");
+          $("#detalleUbicacion").text($("#inputUbicacion").attr("value"));
+          $("#detalleProvincia").text($("#inputProvincia").val());
+          $("#detalleUrgencia").text($("#inputUrgencia").attr("value"));
+          $("#btnEditarReporte").addClass("d-none");
   $("#btnCancelarReporte").addClass("d-none");
   $("#btnEditarDatos").removeClass("d-none");
         }
@@ -114,6 +424,53 @@ $("#modalDetalleReporte").modal("hide");
 
 });
 
+$(document).on("click", ".btnAgregarNotas", function () {
+
+  const idReporte = $(this).data("id");
+  const idUsuario = usuario.id;
+  const nombre = usuario.nombre;
+
+  Swal.fire({
+    title: "Agregar nota",
+    input: "textarea",
+    inputLabel: "Nota",
+    inputPlaceholder: "Escriba la nota...",
+    showCancelButton: true,
+    confirmButtonText: "Guardar",
+    cancelButtonText: "Cancelar",
+    inputValidator: (value) => {
+      if (!value) {
+        return "La nota no puede estar vacía";
+      }
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+
+      $.ajax({
+        url: `/api/reportes/notas/`,
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+          idReporte: idReporte,
+          nota: result.value,
+          autorId: idUsuario,
+          autorNombre: nombre
+        }),
+        success: function (response) {
+          Swal.fire("Éxito", response.message, "success");
+        },
+        error: function (err) {
+          Swal.fire(
+            "Error",
+            err.responseJSON?.error || "No se pudo agregar la nota",
+            "error"
+          );
+        }
+      });
+
+    }
+  });
+});
 
 
 $(document).on("click", ".btnEliminarEvidencia", function () {
@@ -132,12 +489,13 @@ $(document).on("click", "#btnEditarReporte", function () {
   const nuevas = $("#nuevasEvidencias")[0].files;
 
   const formData = new FormData();
-
+    const estado = $("#inputEstado").length ? $("#inputEstado").val() : $("#detalleEstado").text();
     const descripcion = $("#inputDescripcion").length ? $("#inputDescripcion").val() : $("#detalleDescripcion").text();
-  const ubicacion   = $("#inputUbicacion").length ? $("#inputUbicacion").val() : $("#detalleUbicacion").text();
-  const provincia   = $("#inputProvincia").length ? $("#inputProvincia").val() : $("#detalleProvincia").text();
-  const urgencia    = $("#inputUrgencia").length ? $("#inputUrgencia").val() : $("#detalleUrgencia").text();
+    const ubicacion   = $("#inputUbicacion").length ? $("#inputUbicacion").val() : $("#detalleUbicacion").text();
+    const provincia   = $("#inputProvincia").length ? $("#inputProvincia").val() : $("#detalleProvincia").text();
+    const urgencia    = $("#inputUrgencia").length ? $("#inputUrgencia").val() : $("#detalleUrgencia").text();
 
+  formData.append("estado", estado);  
   formData.append("descripcion", descripcion);
   formData.append("ubicacion", ubicacion);
   formData.append("provincia", provincia);
@@ -297,10 +655,11 @@ $(document).on("click", "#btnEditarReporte", function () {
 
   });
 
-  $(document).on("click", ".btnVer", function () {
+$(document).on("click", ".btnVer", function () {
+   $("#modalDetalleReporte").modal("show");
 
   const id = $(this).data("id");
-
+  
   $.ajax({
     url: `/api/reportes/${id}`,
     method: "GET",
@@ -349,10 +708,13 @@ $(document).on("click", "#btnEditarReporte", function () {
             ".nuevasEvidencias"
         ).addClass("d-none");
       }
+        $("#btnVerNotas").removeClass("d-none").data("id", rep._id);
 
-      $("#modalDetalleReporte").modal("show");
+   
 
     }
+
+    
   });
 
 });
@@ -360,6 +722,18 @@ $(document).on("click", "#btnEditarReporte", function () {
 
 $("#btnEditarDatos").click(function() {
 
+  if(usuario.rol === "admin") {
+    const estado = $("#detalleEstado").text();
+    $("#detalleEstado").html(`
+    <select id="inputEstado" class="form-control">
+      <option value="Pendiente" ${estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+      <option value="En Revision" ${estado === 'En Revision' ? 'selected' : ''}>En Revisión</option>
+      <option value="Resuelto" ${estado === 'Resuelto' ? 'selected' : ''}>Resuelto</option>
+      <option value="Transferido" ${estado === 'Transferido' ? 'selected' : ''}>Transferido</option>
+      <option value="Cancelado" ${estado === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+    </select>
+  `);
+  }
 
   // Obtener valores actuales
   const descripcion = $("#detalleDescripcion").text();
@@ -394,9 +768,9 @@ $("#inputProvincia").val(provincia);
 
   $("#detalleUrgencia").html(`
     <select id="inputUrgencia" class="form-control">
-      <option value="baja" ${urgencia === 'baja' ? 'selected' : ''}>Baja</option>
-      <option value="media" ${urgencia === 'media' ? 'selected' : ''}>Media</option>
-      <option value="alta" ${urgencia === 'alta' ? 'selected' : ''}>Alta</option>
+      <option value="Baja" ${urgencia === 'Baja' ? 'selected' : ''}>Baja</option>
+      <option value="Media" ${urgencia === 'Media' ? 'selected' : ''}>Media</option>
+      <option value="Alta" ${urgencia === 'Alta' ? 'selected' : ''}>Alta</option>
     </select>
   `);
   // Alternar botones
@@ -404,5 +778,61 @@ $("#inputProvincia").val(provincia);
   $("#btnEditarReporte").removeClass("d-none");
   $("#btnCancelarReporte").removeClass("d-none");
 });
+
+
+$(document).on("click", ".btnVerAdmin", function () {
+
+  const id = $(this).data("id");
+
+  $.ajax({
+    url: `/api/reportes/${id}`,
+    method: "GET",
+
+    success: function (rep) {
+
+      $("#detalleDescripcion").text(rep.descripcion);
+      $("#detalleUbicacion").text(rep.ubicacion);
+      $("#detalleProvincia").text(rep.provincia);
+      $("#detalleUrgencia").text(rep.urgencia);
+      $("#detalleEstado").text(rep.estado || "Pendiente");
+
+      let html = "";
+
+  rep.evidencias?.forEach(ev => {
+
+    html += `
+      <div class="position-relative m-2">
+
+        ${
+          ev.match(/\.(mp4|webm|ogg)$/i)
+            ? `<video width="120" controls><source src="${ev}"></video>`
+            : `<img src="${ev}" width="120" class="rounded"/>`
+        }
+
+        <button class="btn btn-danger btn-sm position-absolute top-0 end-0 btnEliminarEvidencia" data-url="${ev}">
+          X
+        </button>
+
+      </div>
+    `;
+  });
+
+  $("#contenedorEvidenciasActuales").html(html);
+
+      
+  
+        $("#btnEditarReporte").removeClass("d-none").data("id", rep._id);
+        $("#btnCancelarReporte").removeClass("d-none").data("id", rep._id);
+        $("#btnEditarDatos").removeClass("d-none").data("id", rep._id);
+        $("#btnVerNotas").removeClass("d-none").data("id", rep._id);
+
+      $("#modalDetalleReporte").modal("show");
+
+    }
+  });
+
+});
+
+
 
 });

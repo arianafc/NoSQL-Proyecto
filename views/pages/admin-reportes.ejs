@@ -82,9 +82,9 @@
     <div class="mb-3 col-md-6">
       <label class="form-label">URGENCIA</label>
       <select class="form-control" id="urgencia">
-        <option value="Baja">Baja</option>
-        <option value="Media">Media</option>
-        <option value="Alta">Alta</option>
+        <option value="baja">Baja</option>
+        <option value="media">Media</option>
+        <option value="alta">Alta</option>
       </select>
     </div>
 
@@ -127,6 +127,7 @@
       <table class="table align-middle">
         <thead>
           <tr>
+            <th>Generado por</th>
             <th>Descripción del Caso</th>
             <th>Ubicación</th>
             <th>Urgencia</th>
@@ -138,12 +139,13 @@
           </tr>
         </thead>
 
-        <tbody id="tablaMisReportes"></tbody>
+        <tbody id="tablaReportes"></tbody>
 
       </table>
 
     </div>
   </div>
+
 
 <div class="modal fade" id="modalDetalleReporte" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -185,6 +187,51 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal fade" id="modalAsignarOrganizacion" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Asignar organización</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+       
+<div class="row align-items-center mb-3">
+  <div class="col-md-6">
+    <h6 class="fw-semibold text-warning mb-0">
+      Organizaciones sugeridas
+    </h6>
+  </div>
+  <div class="col-md-6 text-end">
+    <button id="obtenerTodasOrganizaciones" class="btn btn-sm btn-outline-primary">
+      Ver todas
+    </button>
+  </div>
+</div>
+
+        
+        <div id="contenedorOrganizaciones" class="row g-3">
+          <!-- Cards dinámicas -->
+        </div>
+
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
 </div>
 
