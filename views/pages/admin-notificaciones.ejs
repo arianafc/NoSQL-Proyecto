@@ -1,0 +1,92 @@
+<div class="container-fluid mt-4">
+
+  <h2 class="mb-4">Gestión de Notificaciones</h2>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <% if (typeof exito !== 'undefined' && exito) { %>
+    <div class="alert alert-success"><%= exito %></div>
+  <% } %>
+
+  <!-- Crear -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="mb-3">Crear Notificación</h5>
+
+      <form action="/admin/notificaciones" method="POST" class="row g-2">
+        <div class="col-md-4">
+          <input type="text" name="titulo" class="form-control" placeholder="Título" required>
+        </div>
+
+        <div class="col-md-4">
+          <input type="text" name="tipo" class="form-control" placeholder="Tipo" required>
+        </div>
+
+        <div class="col-md-4">
+          <button class="btn btn-primary w-100">Crear</button>
+        </div>
+
+        <div class="col-12">
+          <textarea name="mensaje" class="form-control" placeholder="Mensaje" required></textarea>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="card">
+    <div class="card-body">
+
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Tipo</th>
+            <th>Mensaje</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% notificaciones.forEach(n => { %>
+            <tr class="<%= !n.leido ? 'table-warning' : '' %>">
+              <td><%= n.titulo %></td>
+              <td><%= n.tipo %></td>
+              <td><%= n.mensaje %></td>
+              <td>
+                <% if (n.leido) { %>
+                  <span class="badge bg-success">Leído</span>
+                <% } else { %>
+                  <span class="badge bg-danger">No leído</span>
+                <% } %>
+              </td>
+              <td>
+                <div class="d-flex gap-2">
+
+                  <% if (!n.leido) { %>
+                  <form action="/admin/notificaciones/leido" method="POST" class="m-0">
+                    <input type="hidden" name="id" value="<%= n._id %>">
+                    <button class="btn btn-sm btn-outline-success">✔</button>
+                  </form>
+                  <% } %>
+
+                  <form action="/admin/notificaciones/eliminar" method="POST" class="m-0">
+                    <input type="hidden" name="id" value="<%= n._id %>">
+                    <button class="btn btn-sm btn-outline-danger">🗑</button>
+                  </form>
+
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+
+</div>

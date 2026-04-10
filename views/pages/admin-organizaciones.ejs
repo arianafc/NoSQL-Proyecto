@@ -1,0 +1,108 @@
+<div class="container-fluid mt-4">
+
+  <h2 class="mb-4">Gestión de Organizaciones</h2>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <% if (typeof exito !== 'undefined' && exito) { %>
+    <div class="alert alert-success"><%= exito %></div>
+  <% } %>
+
+  <!-- Crear -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="mb-3">Crear Organización</h5>
+
+      <form action="/admin/organizaciones" method="POST" class="row g-2">
+
+        <div class="col-md-4">
+          <input type="text" name="nombre" class="form-control" placeholder="Nombre" required>
+        </div>
+
+        <div class="col-md-4">
+          <input type="text" name="tipo" class="form-control" placeholder="Tipo" required>
+        </div>
+
+        <div class="col-md-4">
+          <input type="email" name="correo" class="form-control" placeholder="Correo" required>
+        </div>
+
+        <div class="col-md-4">
+          <input type="text" name="telefono" class="form-control" placeholder="Teléfono">
+        </div>
+
+        <div class="col-md-8">
+          <input type="text" name="direccion" class="form-control" placeholder="Dirección">
+        </div>
+
+        <div class="col-12">
+          <textarea name="descripcion" class="form-control" placeholder="Descripción"></textarea>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-primary">Crear</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="card">
+    <div class="card-body">
+
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% organizaciones.forEach(o => { %>
+            <tr>
+              <td><%= o.nombre %></td>
+              <td><%= o.tipo %></td>
+              <td><%= o.correo %></td>
+              <td><%= o.telefono || '-' %></td>
+              <td>
+                <% if (o.verificado) { %>
+                  <span class="badge bg-success">Verificado</span>
+                <% } else { %>
+                  <span class="badge bg-warning text-dark">Pendiente</span>
+                <% } %>
+              </td>
+              <td>
+                <div class="d-flex gap-2">
+
+                  <% if (!o.verificado) { %>
+                  <form action="/admin/organizaciones/verificar" method="POST" class="m-0">
+                    <input type="hidden" name="id" value="<%= o._id %>">
+                    <button class="btn btn-sm btn-outline-success">✔</button>
+                  </form>
+                  <% } %>
+
+                  <form action="/admin/organizaciones/eliminar" method="POST" class="m-0">
+                    <input type="hidden" name="id" value="<%= o._id %>">
+                    <button class="btn btn-sm btn-outline-danger">🗑</button>
+                  </form>
+
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+
+</div>

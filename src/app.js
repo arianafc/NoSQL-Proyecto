@@ -1,11 +1,15 @@
 const express = require('express');
 const connectDB = require('./config/db');
 const usuarioRoutes = require('./routes/usuarioRoutes');
+const organizacionRoutes = require('./routes/organizacionRoutes');
+const notificacionRoutes = require('./routes/notificacionRoutes');
 const cors = require('cors');
 const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // 🔥 Middlewares
 app.use(cors());
@@ -60,6 +64,8 @@ connectDB()
 
 // 🔥 API
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/admin', organizacionRoutes);
+app.use('/admin', notificacionRoutes);
 
 // 🔥 Servidor
 app.listen(3000, () => console.log('Servidor corriendo 🚀'));
