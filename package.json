@@ -6,7 +6,8 @@
     "ejs": "^5.0.1",
     "express": "^5.2.1",
     "express-ejs-layouts": "^2.5.1",
-    "mongodb": "^7.1.1"
+    "mongodb": "^7.1.1",
+    "multer": "^2.1.1"
   },
   "name": "nosql-proyecto",
   "version": "1.0.0",
