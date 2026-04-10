@@ -17,8 +17,12 @@ verificarSesion();
 
 function mostrarOpcionesAdmin() {
   const usuario = JSON.parse(localStorage.getItem('usuario'));
-    if (usuario && usuario.rol === 'Administrador') {
-        $("#adminOpciones").removeClass("d-none");
+    if (usuario && usuario.rol === 'admin') {
+        $(".adminOpciones").removeClass("d-none");
+         $(".usuarioOpciones").addClass("d-none");
+    } else if (usuario && usuario.rol === 'usuario') {
+       $(".usuarioOpciones").removeClass("d-none");
+        $(".adminOpciones").addClass("d-none");
     }
 }
 
