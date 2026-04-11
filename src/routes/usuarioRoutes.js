@@ -15,4 +15,10 @@ router.get('/', usuarioController.getUsuarios);
 router.put('/rol/:id', usuarioController.updateRol);
 router.put('/estado/:id', usuarioController.updateEstado);
 
+
+//RECUPERAR ACCESO
+router.post('/recuperarContrasenna', usuarioController.validarCorreoRecuperacion);
+router.post('/actualizarPassword', usuarioController.actualizarPassword);
+
+
 module.exports = router;

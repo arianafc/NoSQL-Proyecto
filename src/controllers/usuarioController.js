@@ -2,6 +2,11 @@ const connectDB = require('../config/db');
 const { ObjectId } = require('mongodb');
 const Usuario = require('../models/usuarioModel');
 const bcrypt = require('bcrypt');
+const nodemailer = require("nodemailer");
+
+function generarPasswordTemporal() {
+  return Math.random().toString(36).slice(-8); 
+}
 
 
 // REGISTRAR USUARIO
@@ -77,6 +82,7 @@ exports.loginUsuario = async (req, res) => {
         nombre: usuario.nombre,
         email: usuario.email,
         rol: usuario.rol,
+        passwordTemporal: usuario.passwordTemporal || false,
         cedula: usuario.cedula,
         telefono: usuario.telefono,
         voluntario: usuario.voluntario || false,
@@ -84,6 +90,32 @@ exports.loginUsuario = async (req, res) => {
         disponibilidad: usuario.disponibilidad || ''
       }
     });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+//ACTUALIZAR CONTRASEÑA
+
+exports.actualizarPassword = async (req, res) => {
+  try {
+    const { userId, nuevoPassword } = req.body;
+
+    const db = await connectDB();
+    const hash = await bcrypt.hash(nuevoPassword, 10)
+    await db.collection('usuarios').updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          password: hash,
+          passwordTemporal: false
+        }
+      }
+    );
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -218,3 +250,81 @@ exports.actualizarPerfil = async (req, res) => {
     res.status(500).json({ message: 'Error actualizando perfil' });
   } 
 };
+
+exports.validarCorreoRecuperacion = async (req, res) => {
+  try {
+    const { correo } = req.body;
+
+    if (!correo) {
+      return res.status(400).json({
+        message: "El correo es requerido"
+      });
+    }
+
+    const db = await connectDB();
+
+    const usuario = await db
+      .collection("usuarios")
+      .findOne({ email: correo });
+
+    if (!usuario) {
+      return res.json({
+        existe: false,
+        message: "Si el correo existe, se enviará una contraseña temporal"
+      });
+    }
+
+    const passwordTemporal = generarPasswordTemporal();
+
+    const hash = await bcrypt.hash(passwordTemporal,10);
+
+    
+ await db.collection("usuarios").updateOne(
+      { _id: usuario._id },
+      {
+        $set: {
+          password: hash,
+          passwordTemporal: true
+        }
+      }
+    );
+
+    await enviarCorreoTemporal(correo, passwordTemporal);
+    
+      res.json({
+        message: "Se ha generado una contraseña temporal. Asegurate de cambiarla"
+      });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error al validar el correo"
+    });
+  }
+};
+
+
+async function enviarCorreoTemporal(correo, passwordTemporal) {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "faunalink4@gmail.com",        // 🔴 tu correo
+      pass: "czce oxke srio zyhg"      // 🔴 contraseña de aplicación
+    }
+  });
+
+  await transporter.sendMail({
+    from: '"FaunaLink" <tucorreo@gmail.com>',
+    to: correo,
+    subject: "Contraseña temporal - FaunaLink",
+    html: `
+      <p>Hola,</p>
+      <p>Se ha generado una contraseña temporal para tu cuenta.</p>
+      <p><strong>Contraseña temporal:</strong></p>
+      <h2>${passwordTemporal}</h2>
+      <p>Te recomendamos iniciar sesión y cambiarla lo antes posible.</p>
+      <br>
+      <p>FaunaLink</p>
+    `
+  });
+}

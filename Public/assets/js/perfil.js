@@ -10,6 +10,69 @@ $(document).ready(function() {
     $("#cardVoluntariado").addClass('d-none');
 }
 
+if (usuario.passwordTemporal) {
+  const aviso = document.getElementById("avisoPasswordTemporal");
+
+  aviso.classList.remove("d-none");
+
+}
+
+document.getElementById("formActualizarContrasenna").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const nueva = document.getElementById("contrasennaActualizar").value.trim();
+  const confirmar = document.getElementById("contrasennaConfirmarActualizar").value.trim();
+
+  if (!nueva || !confirmar) {
+  Swal.fire("Error", "Debes completar ambos campos", "warning");
+  return;
+}
+
+if (nueva.length < 6) {
+  Swal.fire(
+    "Contraseña inválida",
+    "La contraseña debe tener al menos 6 caracteres",
+    "warning"
+  );
+  return;
+}
+
+if (nueva !== confirmar) {
+  Swal.fire(
+    "Error",
+    "Las contraseñas no coinciden",
+    "error"
+  );
+  return;
+}
+  fetch(APIUsuario+"actualizarPassword", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      nuevoPassword: nueva,
+      userId: usuario.id
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      Swal.fire({
+        icon: "success",
+        title: "Contraseña actualizada",
+        text: data.message
+      }).then(() => {
+        usuario.passwordTemporal === false;
+        location.reload();
+      });
+    })
+    .catch(() => {
+      Swal.fire("Error", "No se pudo actualizar la contraseña", "error");
+    });
+});
+
+
+
 
 $('#activarVoluntariado').change(function() {
   if ($(this).is(':checked')) {
