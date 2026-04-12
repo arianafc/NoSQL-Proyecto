@@ -1,0 +1,654 @@
+<style>
+  :root {
+    --primary: #6c63ff;
+    --primary-dark: #5a52d5;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --light-bg: #f4f5f7;
+    --card-bg: #ffffff;
+    --text-main: #1e1e2e;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+  }
+
+  .vol-section { padding: 1.5rem; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
+  .tab-btn { padding: 0.7rem 1.5rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── STATS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--card-bg); border-radius: 12px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .stat-card .s-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+  .stat-card .s-value { font-size: 2rem; font-weight: 700; }
+
+  /* ── FILTROS ── */
+  .filters-bar { background: var(--card-bg); border-radius: 12px; padding: 1rem 1.5rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .v-search { flex: 1; min-width: 200px; padding: 0.5rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+  .v-search:focus { border-color: var(--primary); }
+  .v-select { padding: 0.5rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.88rem; background: #fff; cursor: pointer; outline: none; }
+
+  /* ── CARDS VOLUNTARIADOS ── */
+  .vol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+  .vol-card { background: var(--card-bg); border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.18s, box-shadow 0.18s; display: flex; flex-direction: column; }
+  .vol-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(108,99,255,0.12); }
+  .vol-card-header { padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+  .vol-card-title { font-size: 1rem; font-weight: 700; line-height: 1.3; }
+  .vol-card-org { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+  .vol-card-body { padding: 1rem 1.25rem; flex: 1; display: flex; flex-direction: column; gap: 0.55rem; }
+  .vol-info-row { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; }
+  .vol-info-row .vi-icon { flex-shrink: 0; }
+  .vol-info-row .vi-val { color: var(--text-muted); }
+  .vol-info-row .vi-val strong { color: var(--text-main); }
+  .vol-desc { font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-clamp: 3; overflow: hidden; }
+  .vol-card-footer { padding: 0.75rem 1.25rem; border-top: 1px solid var(--border); display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+  /* ── TABLA ── */
+  .table-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
+  .table-card table { width: 100%; border-collapse: collapse; }
+  .table-card thead { background: var(--light-bg); }
+  .table-card th { padding: 0.85rem 1rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; text-align: left; border-bottom: 1px solid var(--border); }
+  .table-card td { padding: 0.9rem 1rem; font-size: 0.88rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .table-card tr:last-child td { border-bottom: none; }
+  .table-card tr:hover td { background: #f9f9ff; }
+
+  .user-cell { display: flex; align-items: center; gap: 0.7rem; }
+  .v-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+  .u-name { font-weight: 600; font-size: 0.88rem; }
+  .u-email { font-size: 0.75rem; color: var(--text-muted); }
+
+  /* ── BADGES ── */
+  .v-badge { padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+  .badge-skill { background: #ede9fe; color: var(--primary-dark); }
+  .badge-more  { background: var(--border); color: var(--text-muted); }
+  .v-badges { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .status-badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+  .s-activo   { background: #dcfce7; color: #15803d; }
+  .s-inactivo { background: #fee2e2; color: #b91c1c; }
+  .disp-badge { padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+  .d-siempre { background: #dcfce7; color: #15803d; }
+  .d-fines   { background: #dbeafe; color: #1d4ed8; }
+  .d-semana  { background: #fef9c3; color: #854d0e; }
+  .d-otro    { background: #f3f4f6; color: #374151; }
+
+  /* ── BOTONES ── */
+  .v-btn { padding: 0.45rem 1rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.84rem; font-weight: 600; transition: opacity 0.18s, transform 0.1s; display: inline-flex; align-items: center; gap: 0.35rem; }
+  .v-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .v-btn-primary  { background: var(--primary); color: #fff; }
+  .v-btn-warning  { background: var(--warning); color: #fff; }
+  .v-btn-danger   { background: var(--danger);  color: #fff; }
+  .v-btn-success  { background: var(--success); color: #fff; }
+  .v-btn-outline  { background: transparent; border: 1.5px solid var(--primary); color: var(--primary); }
+  .v-btn-sm { padding: 0.3rem 0.65rem; font-size: 0.78rem; border-radius: 6px; }
+
+  /* ── MODAL ── */
+  .v-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2000; align-items: center; justify-content: center; }
+  .v-modal-overlay.active { display: flex; }
+  .v-modal { background: #fff; border-radius: 16px; padding: 2rem; width: 100%; max-width: 580px; max-height: 92vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); animation: vSlideUp 0.22s ease; }
+  @keyframes vSlideUp { from { transform: translateY(28px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+  .v-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .v-modal-title { font-size: 1.15rem; font-weight: 700; }
+  .v-modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted); line-height: 1; }
+
+  /* ── FORM ── */
+  .v-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .v-form-group { margin-bottom: 1rem; }
+  .v-form-label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted); }
+  .v-form-control { width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.88rem; transition: border-color 0.2s; outline: none; font-family: inherit; }
+  .v-form-control:focus { border-color: var(--primary); }
+  textarea.v-form-control { resize: vertical; min-height: 80px; }
+  .v-form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+  /* ── DETALLE ── */
+  .detail-section { margin-bottom: 1.25rem; }
+  .detail-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 700; margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1.5rem; }
+  .detail-item .d-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+  .detail-item .d-val { font-size: 0.9rem; font-weight: 500; margin-top: 0.1rem; }
+
+  /* ── EMPTY ── */
+  .v-empty { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+  .v-empty .e-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+
+  /* ── TOAST ── */
+  .v-toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+  .v-toast { padding: 0.8rem 1.2rem; border-radius: 10px; color: #fff; font-size: 0.87rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.15); animation: vFadeUp 0.28s ease; }
+  .v-toast-success { background: var(--success); }
+  .v-toast-error   { background: var(--danger); }
+  @keyframes vFadeUp { from { transform: translateY(16px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+</style>
+
+<div class="vol-section" id="appData"
+     data-voluntariados="<%- JSON.stringify(voluntariados).replace(/"/g, '&quot;') %>">
+
+  <!-- HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">🐾 Gestión de Voluntariados</h2>
+    <button class="v-btn v-btn-primary" onclick="abrirModalCrear()">➕ Nuevo Voluntariado</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-voluntariados', this)">📋 Voluntariados</button>
+    <button class="tab-btn"        onclick="switchTab('tab-voluntarios',   this)">👥 Voluntarios Registrados</button>
+  </div>
+
+  <!-- ═══ TAB 1: VOLUNTARIADOS ═══ -->
+  <div class="tab-content active" id="tab-voluntariados">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="s-label">Total</div>
+        <div class="s-value" style="color:var(--primary)"><%= voluntariados.length %></div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">Activos</div>
+        <div class="s-value" style="color:var(--success)"><%= voluntariados.filter(v => v.estado === 'activo').length %></div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">Inactivos</div>
+        <div class="s-value" style="color:var(--danger)"><%= voluntariados.filter(v => v.estado !== 'activo').length %></div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">Provincias</div>
+        <div class="s-value" style="color:var(--warning)"><%= new Set(voluntariados.map(v => v.provincia)).size %></div>
+      </div>
+    </div>
+
+    <div class="filters-bar">
+      <input type="text" class="v-search" id="searchVol" placeholder="🔍 Buscar por nombre u organización..." oninput="filtrarVoluntariados()" />
+      <select class="v-select" id="filtroEstadoVol" onchange="filtrarVoluntariados()">
+        <option value="">Todos los estados</option>
+        <option value="activo">Activos</option>
+        <option value="inactivo">Inactivos</option>
+      </select>
+      <select class="v-select" id="filtroProv" onchange="filtrarVoluntariados()">
+        <option value="">Todas las provincias</option>
+        <option>San José</option><option>Alajuela</option><option>Cartago</option>
+        <option>Heredia</option><option>Guanacaste</option><option>Puntarenas</option><option>Limón</option>
+      </select>
+    </div>
+
+    <div class="vol-grid" id="volGrid">
+      <% if (voluntariados.length === 0) { %>
+        <div class="v-empty" style="grid-column:1/-1">
+          <div class="e-icon">📭</div>
+          <p>No hay voluntariados registrados aún.<br>Crea el primero con el botón de arriba.</p>
+        </div>
+      <% } %>
+      <% voluntariados.forEach(v => { const esActivo = v.estado === 'activo'; %>
+      <div class="vol-card"
+           data-nombre="<%= (v.nombre||'').toLowerCase() %>"
+           data-org="<%= (v.organizacion||'').toLowerCase() %>"
+           data-estado="<%= v.estado %>"
+           data-prov="<%= (v.provincia||'').toLowerCase() %>">
+        <div class="vol-card-header">
+          <div>
+            <div class="vol-card-title"><%= v.nombre %></div>
+            <div class="vol-card-org">🏢 <%= v.organizacion || '—' %></div>
+          </div>
+          <span class="status-badge <%= esActivo ? 's-activo' : 's-inactivo' %>">
+            <%= esActivo ? '● Activo' : '● Inactivo' %>
+          </span>
+        </div>
+        <div class="vol-card-body">
+          <div class="vol-info-row">
+            <span class="vi-icon">📍</span>
+            <span class="vi-val"><strong><%= v.provincia %></strong><% if(v.canton) { %> — <%= v.canton %><% } %></span>
+          </div>
+          <div class="vol-info-row">
+            <span class="vi-icon">🏠</span>
+            <span class="vi-val"><%= v.direccion %></span>
+          </div>
+          <% if (v.fechaInicio) { %>
+          <div class="vol-info-row">
+            <span class="vi-icon">📅</span>
+            <span class="vi-val"><%= new Date(v.fechaInicio).toLocaleDateString('es-CR') %><% if(v.fechaFin) { %> → <%= new Date(v.fechaFin).toLocaleDateString('es-CR') %><% } %></span>
+          </div>
+          <% } %>
+          <% if (v.cupoMaximo) { %>
+          <div class="vol-info-row">
+            <span class="vi-icon">👥</span>
+            <span class="vi-val">Cupo: <strong><%= v.cupoMaximo %></strong> personas</span>
+          </div>
+          <% } %>
+          <p class="vol-desc"><%= v.descripcion %></p>
+        </div>
+        <div class="vol-card-footer">
+          <button class="v-btn v-btn-outline v-btn-sm" onclick="verDetalleVol('<%= v._id %>')">👁 Ver</button>
+          <button class="v-btn v-btn-warning v-btn-sm" onclick="abrirModalEditar('<%= v._id %>')">✏️ Editar</button>
+          <% if (esActivo) { %>
+            <button class="v-btn v-btn-danger v-btn-sm" onclick="cambiarEstadoVol('<%= v._id %>', 'inactivo')">🚫 Inactivar</button>
+          <% } else { %>
+            <button class="v-btn v-btn-success v-btn-sm" onclick="cambiarEstadoVol('<%= v._id %>', 'activo')">✅ Activar</button>
+          <% } %>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- ═══ TAB 2: VOLUNTARIOS ═══ -->
+  <div class="tab-content" id="tab-voluntarios">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="s-label">Total Voluntarios</div>
+        <div class="s-value" style="color:var(--primary)"><%= voluntarios.length %></div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">Activos</div>
+        <div class="s-value" style="color:var(--success)"><%= voluntarios.filter(u => u.estado).length %></div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">Siempre disponibles</div>
+        <div class="s-value" style="color:var(--primary)"><%= voluntarios.filter(u => (u.disponibilidad||'').toLowerCase() === 'siempre').length %></div>
+      </div>
+    </div>
+
+    <div class="filters-bar">
+      <input type="text" class="v-search" id="searchUsuario" placeholder="🔍 Buscar por nombre o correo..." oninput="filtrarUsuarios()" />
+      <select class="v-select" id="filtroDispUser" onchange="filtrarUsuarios()">
+        <option value="">Toda disponibilidad</option>
+        <option value="siempre">Siempre</option>
+        <option value="fines de semana">Fines de semana</option>
+        <option value="entre semana">Entre semana</option>
+      </select>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Voluntario</th>
+            <th>Teléfono</th>
+            <th>Cédula</th>
+            <th>Disponibilidad</th>
+            <th>Habilidades</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyVoluntarios">
+          <% if (voluntarios.length === 0) { %>
+            <tr><td colspan="6"><div class="v-empty"><div class="e-icon">🐕</div><p>No hay voluntarios registrados.</p></div></td></tr>
+          <% } %>
+          <% voluntarios.forEach(u => {
+               const dv = (u.disponibilidad||'').toLowerCase();
+               let dClass = 'd-otro';
+               if (dv==='siempre') dClass='d-siempre';
+               else if (dv.includes('fin')) dClass='d-fines';
+               else if (dv.includes('semana')) dClass='d-semana';
+          %>
+          <tr data-uname="<%= (u.nombre||'').toLowerCase() %>"
+              data-uemail="<%= (u.email||'').toLowerCase() %>"
+              data-udisp="<%= dv %>">
+            <td>
+              <div class="user-cell">
+                <div class="v-avatar"><%= u.nombre ? u.nombre.charAt(0).toUpperCase() : '?' %></div>
+                <div>
+                  <div class="u-name"><%= u.nombre %></div>
+                  <div class="u-email"><%= u.email %></div>
+                </div>
+              </div>
+            </td>
+            <td><%= u.telefono || '—' %></td>
+            <td><%= u.cedula   || '—' %></td>
+            <td><span class="disp-badge <%= dClass %>"><%= u.disponibilidad || 'No especificada' %></span></td>
+            <td>
+              <div class="v-badges">
+                <% (u.habilidades||[]).slice(0,3).forEach(h => { %><span class="v-badge badge-skill"><%= h %></span><% }) %>
+                <% if((u.habilidades||[]).length > 3) { %><span class="v-badge badge-more">+<%= u.habilidades.length-3 %></span><% } %>
+                <% if(!(u.habilidades||[]).length) { %><span style="color:var(--text-muted);font-size:0.78rem">—</span><% } %>
+              </div>
+            </td>
+            <td><span class="status-badge <%= u.estado ? 's-activo':'s-inactivo' %>"><%= u.estado ? '● Activo':'● Inactivo' %></span></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="v-modal-overlay" id="modalDetalle">
+  <div class="v-modal">
+    <div class="v-modal-header">
+      <span class="v-modal-title">📋 Detalle del Voluntariado</span>
+      <button class="v-modal-close" onclick="cerrarModal('modalDetalle')">✕</button>
+    </div>
+    <div id="detalleVolContent">Cargando...</div>
+    <div class="v-form-actions">
+      <button class="v-btn v-btn-outline" onclick="cerrarModal('modalDetalle')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CREAR -->
+<div class="v-modal-overlay" id="modalCrear">
+  <div class="v-modal">
+    <div class="v-modal-header">
+      <span class="v-modal-title">➕ Nuevo Voluntariado</span>
+      <button class="v-modal-close" onclick="cerrarModal('modalCrear')">✕</button>
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Nombre *</label>
+        <input type="text" id="c-nombre" class="v-form-control" placeholder="Ej: Rescate Playas del Sur" />
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Organización *</label>
+        <input type="text" id="c-org" class="v-form-control" placeholder="Nombre de la ONG o refugio" />
+      </div>
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Provincia *</label>
+        <select id="c-provincia" class="v-form-control">
+          <option value="">Seleccione...</option>
+          <option>San José</option><option>Alajuela</option><option>Cartago</option>
+          <option>Heredia</option><option>Guanacaste</option><option>Puntarenas</option><option>Limón</option>
+        </select>
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Cantón</label>
+        <input type="text" id="c-canton" class="v-form-control" placeholder="Ej: Desamparados" />
+      </div>
+    </div>
+    <div class="v-form-group">
+      <label class="v-form-label">Dirección exacta *</label>
+      <input type="text" id="c-direccion" class="v-form-control" placeholder="Ej: 200m norte de la iglesia central" />
+    </div>
+    <div class="v-form-group">
+      <label class="v-form-label">Descripción *</label>
+      <textarea id="c-descripcion" class="v-form-control" placeholder="Describe el objetivo y actividades..."></textarea>
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Fecha de inicio</label>
+        <input type="date" id="c-fechaInicio" class="v-form-control" />
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Fecha de fin</label>
+        <input type="date" id="c-fechaFin" class="v-form-control" />
+      </div>
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Cupo máximo</label>
+        <input type="number" id="c-cupo" class="v-form-control" placeholder="Ej: 20" min="1" />
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Contacto</label>
+        <input type="text" id="c-contacto" class="v-form-control" placeholder="Ej: 88001234" />
+      </div>
+    </div>
+    <div class="v-form-group">
+      <label class="v-form-label">Requisitos para participar</label>
+      <input type="text" id="c-requisitos" class="v-form-control" placeholder="Ej: Mayor de edad, transporte propio" />
+    </div>
+    <div class="v-form-actions">
+      <button class="v-btn v-btn-outline" onclick="cerrarModal('modalCrear')">Cancelar</button>
+      <button class="v-btn v-btn-primary" onclick="crearVoluntariado()">Crear Voluntariado</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="v-modal-overlay" id="modalEditar">
+  <div class="v-modal">
+    <div class="v-modal-header">
+      <span class="v-modal-title">✏️ Editar Voluntariado</span>
+      <button class="v-modal-close" onclick="cerrarModal('modalEditar')">✕</button>
+    </div>
+    <input type="hidden" id="e-id" />
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Nombre *</label>
+        <input type="text" id="e-nombre" class="v-form-control" />
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Organización *</label>
+        <input type="text" id="e-org" class="v-form-control" />
+      </div>
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Provincia *</label>
+        <select id="e-provincia" class="v-form-control">
+          <option>San José</option><option>Alajuela</option><option>Cartago</option>
+          <option>Heredia</option><option>Guanacaste</option><option>Puntarenas</option><option>Limón</option>
+        </select>
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Cantón</label>
+        <input type="text" id="e-canton" class="v-form-control" />
+      </div>
+    </div>
+    <div class="v-form-group">
+      <label class="v-form-label">Dirección exacta *</label>
+      <input type="text" id="e-direccion" class="v-form-control" />
+    </div>
+    <div class="v-form-group">
+      <label class="v-form-label">Descripción *</label>
+      <textarea id="e-descripcion" class="v-form-control"></textarea>
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Fecha de inicio</label>
+        <input type="date" id="e-fechaInicio" class="v-form-control" />
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Fecha de fin</label>
+        <input type="date" id="e-fechaFin" class="v-form-control" />
+      </div>
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Cupo máximo</label>
+        <input type="number" id="e-cupo" class="v-form-control" min="1" />
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Contacto</label>
+        <input type="text" id="e-contacto" class="v-form-control" />
+      </div>
+    </div>
+    <div class="v-form-group">
+      <label class="v-form-label">Requisitos</label>
+      <input type="text" id="e-requisitos" class="v-form-control" />
+    </div>
+    <div class="v-form-actions">
+      <button class="v-btn v-btn-outline" onclick="cerrarModal('modalEditar')">Cancelar</button>
+      <button class="v-btn v-btn-primary" onclick="guardarEdicion()">Guardar Cambios</button>
+    </div>
+  </div>
+</div>
+
+<div class="v-toast-container" id="vToastContainer"></div>
+
+<script>
+  const voluntariadosData = JSON.parse(
+    document.getElementById('appData').dataset.voluntariados
+  );
+
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function abrirModal(id)  { document.getElementById(id).classList.add('active'); }
+  function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
+  document.querySelectorAll('.v-modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); });
+  });
+
+  function showToast(msg, tipo = 'success') {
+    const tc = document.getElementById('vToastContainer');
+    const t  = document.createElement('div');
+    t.className = `v-toast v-toast-${tipo}`;
+    t.textContent = msg;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  function filtrarVoluntariados() {
+    const busq   = document.getElementById('searchVol').value.toLowerCase();
+    const estado = document.getElementById('filtroEstadoVol').value;
+    const prov   = document.getElementById('filtroProv').value.toLowerCase();
+    document.querySelectorAll('#volGrid .vol-card').forEach(card => {
+      const ok = (!busq   || card.dataset.nombre.includes(busq) || card.dataset.org.includes(busq))
+              && (!estado || card.dataset.estado === estado)
+              && (!prov   || card.dataset.prov   === prov);
+      card.style.display = ok ? '' : 'none';
+    });
+  }
+
+  function filtrarUsuarios() {
+    const busq = document.getElementById('searchUsuario').value.toLowerCase();
+    const disp = document.getElementById('filtroDispUser').value.toLowerCase();
+    document.querySelectorAll('#tbodyVoluntarios tr[data-uname]').forEach(row => {
+      const ok = (!busq || row.dataset.uname.includes(busq) || row.dataset.uemail.includes(busq))
+              && (!disp || row.dataset.udisp.includes(disp));
+      row.style.display = ok ? '' : 'none';
+    });
+  }
+
+  function verDetalleVol(id) {
+    const v = voluntariadosData.find(x => x._id === id);
+    if (!v) return;
+    const fmt = d => d ? new Date(d).toLocaleDateString('es-CR') : '—';
+    document.getElementById('detalleVolContent').innerHTML = `
+      <div class="detail-section">
+        <div class="detail-section-title">Información General</div>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="d-label">Nombre</div><div class="d-val">${v.nombre||'—'}</div></div>
+          <div class="detail-item"><div class="d-label">Organización</div><div class="d-val">${v.organizacion||'—'}</div></div>
+          <div class="detail-item"><div class="d-label">Provincia</div><div class="d-val">${v.provincia||'—'}</div></div>
+          <div class="detail-item"><div class="d-label">Cantón</div><div class="d-val">${v.canton||'—'}</div></div>
+          <div class="detail-item" style="grid-column:1/-1"><div class="d-label">Dirección</div><div class="d-val">${v.direccion||'—'}</div></div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">Descripción</div>
+        <p style="font-size:0.88rem;line-height:1.6">${v.descripcion||'—'}</p>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">Logística</div>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="d-label">Fecha inicio</div><div class="d-val">${fmt(v.fechaInicio)}</div></div>
+          <div class="detail-item"><div class="d-label">Fecha fin</div><div class="d-val">${fmt(v.fechaFin)}</div></div>
+          <div class="detail-item"><div class="d-label">Cupo máximo</div><div class="d-val">${v.cupoMaximo||'—'}</div></div>
+          <div class="detail-item"><div class="d-label">Contacto</div><div class="d-val">${v.contacto||'—'}</div></div>
+          <div class="detail-item" style="grid-column:1/-1"><div class="d-label">Requisitos</div><div class="d-val">${v.requisitos||'—'}</div></div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">Estado</div>
+        <span class="status-badge ${v.estado==='activo'?'s-activo':'s-inactivo'}">${v.estado==='activo'?'● Activo':'● Inactivo'}</span>
+        <span style="font-size:0.82rem;color:var(--text-muted);margin-left:1rem">Registrado: ${fmt(v.fechaRegistro)}</span>
+      </div>`;
+    abrirModal('modalDetalle');
+  }
+
+  function abrirModalCrear() {
+    ['c-nombre','c-org','c-canton','c-direccion','c-descripcion','c-fechaInicio','c-fechaFin','c-cupo','c-contacto','c-requisitos']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    document.getElementById('c-provincia').value = '';
+    abrirModal('modalCrear');
+  }
+
+  async function crearVoluntariado() {
+    const nombre       = document.getElementById('c-nombre').value.trim();
+    const organizacion = document.getElementById('c-org').value.trim();
+    const provincia    = document.getElementById('c-provincia').value;
+    const canton       = document.getElementById('c-canton').value.trim();
+    const direccion    = document.getElementById('c-direccion').value.trim();
+    const descripcion  = document.getElementById('c-descripcion').value.trim();
+    const fechaInicio  = document.getElementById('c-fechaInicio').value;
+    const fechaFin     = document.getElementById('c-fechaFin').value;
+    const cupoMaximo   = document.getElementById('c-cupo').value;
+    const contacto     = document.getElementById('c-contacto').value.trim();
+    const requisitos   = document.getElementById('c-requisitos').value.trim();
+
+    if (!nombre || !organizacion || !provincia || !direccion || !descripcion) {
+      showToast('Completa los campos obligatorios (*)', 'error'); return;
+    }
+    try {
+      const res = await fetch('/admin/voluntariados', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, organizacion, provincia, canton, direccion, descripcion,
+                               fechaInicio, fechaFin, cupoMaximo: cupoMaximo ? Number(cupoMaximo) : null,
+                               contacto, requisitos })
+      });
+      const data = await res.json();
+      if (res.ok) { showToast('Voluntariado creado ✓'); cerrarModal('modalCrear'); setTimeout(() => location.reload(), 1000); }
+      else showToast(data.message || 'Error al crear', 'error');
+    } catch { showToast('Error de conexión', 'error'); }
+  }
+
+  function abrirModalEditar(id) {
+    const v = voluntariadosData.find(x => x._id === id);
+    if (!v) return;
+    document.getElementById('e-id').value          = id;
+    document.getElementById('e-nombre').value      = v.nombre       || '';
+    document.getElementById('e-org').value         = v.organizacion || '';
+    document.getElementById('e-provincia').value   = v.provincia    || '';
+    document.getElementById('e-canton').value      = v.canton       || '';
+    document.getElementById('e-direccion').value   = v.direccion    || '';
+    document.getElementById('e-descripcion').value = v.descripcion  || '';
+    document.getElementById('e-fechaInicio').value = v.fechaInicio  ? v.fechaInicio.substring(0,10) : '';
+    document.getElementById('e-fechaFin').value    = v.fechaFin     ? v.fechaFin.substring(0,10)    : '';
+    document.getElementById('e-cupo').value        = v.cupoMaximo   || '';
+    document.getElementById('e-contacto').value    = v.contacto     || '';
+    document.getElementById('e-requisitos').value  = v.requisitos   || '';
+    abrirModal('modalEditar');
+  }
+
+  async function guardarEdicion() {
+    const id = document.getElementById('e-id').value;
+    const body = {
+      nombre:       document.getElementById('e-nombre').value.trim(),
+      organizacion: document.getElementById('e-org').value.trim(),
+      provincia:    document.getElementById('e-provincia').value,
+      canton:       document.getElementById('e-canton').value.trim(),
+      direccion:    document.getElementById('e-direccion').value.trim(),
+      descripcion:  document.getElementById('e-descripcion').value.trim(),
+      fechaInicio:  document.getElementById('e-fechaInicio').value,
+      fechaFin:     document.getElementById('e-fechaFin').value,
+      cupoMaximo:   document.getElementById('e-cupo').value ? Number(document.getElementById('e-cupo').value) : null,
+      contacto:     document.getElementById('e-contacto').value.trim(),
+      requisitos:   document.getElementById('e-requisitos').value.trim()
+    };
+    if (!body.nombre || !body.organizacion || !body.provincia || !body.direccion || !body.descripcion) {
+      showToast('Completa los campos obligatorios (*)', 'error'); return;
+    }
+    try {
+      const res = await fetch(`/admin/voluntariados/${id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (res.ok) { showToast('Voluntariado actualizado ✓'); cerrarModal('modalEditar'); setTimeout(() => location.reload(), 1000); }
+      else showToast(data.message || 'Error al actualizar', 'error');
+    } catch { showToast('Error de conexión', 'error'); }
+  }
+
+  async function cambiarEstadoVol(id, nuevoEstado) {
+    if (!confirm(`¿Deseas ${nuevoEstado === 'activo' ? 'activar' : 'inactivar'} este voluntariado?`)) return;
+    try {
+      const res = await fetch(`/admin/voluntariados/${id}/estado`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: nuevoEstado })
+      });
+      const data = await res.json();
+      if (res.ok) { showToast(`Voluntariado ${nuevoEstado === 'activo' ? 'activado':'inactivado'} ✓`); setTimeout(() => location.reload(), 1000); }
+      else showToast(data.message || 'Error', 'error');
+    } catch { showToast('Error de conexión', 'error'); }
+  }
+</script>

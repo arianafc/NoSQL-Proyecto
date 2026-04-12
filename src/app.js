@@ -7,6 +7,7 @@ const reporteRoutes = require('./routes/reporteRoutes');
 const cors = require('cors');
 const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
+const voluntariadoRoutes = require('./routes/voluntariadoRoutes');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -68,7 +69,7 @@ app.get('/admin/reportes', (req, res) => {
   res.render('pages/admin-reportes');
 });
 
-
+app.use('/admin/voluntariados', voluntariadoRoutes);
 
 //  DB
 connectDB()
