@@ -8,7 +8,7 @@ router.post('/registro', usuarioController.registrarUsuario);
 router.post('/login', usuarioController.loginUsuario);
 router.put('/voluntario', usuarioController.serVoluntario);
 router.put('/perfil/', usuarioController.actualizarPerfil);
-
+router.put('/NoVoluntario', usuarioController.desactivarVoluntariado);
 //OBTENER Y EDITAR USUARIOS DESDE ADMIN
 
 router.get('/', usuarioController.getUsuarios);
