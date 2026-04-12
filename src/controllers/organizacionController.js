@@ -141,7 +141,7 @@ exports.vistaOrganizacionesUs = async (req, res) => {
 
     const organizaciones = await db
       .collection('organizaciones')
-      .find()
+      .find({ verificado: true })
       .toArray();
 
     res.render('pages/organizaciones', {
