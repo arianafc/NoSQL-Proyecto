@@ -14,7 +14,7 @@ router.put('/NoVoluntario', usuarioController.desactivarVoluntariado);
 router.get('/', usuarioController.getUsuarios);
 router.put('/rol/:id', usuarioController.updateRol);
 router.put('/estado/:id', usuarioController.updateEstado);
-
+router.post('/usuario', usuarioController.obtenerInfoUsuario);
 
 //RECUPERAR ACCESO
 router.post('/recuperarContrasenna', usuarioController.validarCorreoRecuperacion);

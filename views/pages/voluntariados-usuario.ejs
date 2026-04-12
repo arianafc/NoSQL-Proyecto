@@ -320,6 +320,7 @@
     <div class="vol-empty">
       <div class="icon">⏳</div>
       <h3>Cargando voluntariados…</h3>
+      
     </div>
   </div>
 </div>
@@ -387,6 +388,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     const raw = localStorage.getItem('usuario');
     if (raw) usuarioActual = JSON.parse(raw);
+
     await cargar();
   });
 
@@ -406,7 +408,17 @@
         }
       }
 
-      render(voluntariados);
+      if(usuarioActual.voluntario) {
+          render(voluntariados);
+      } else {
+        document.getElementById('volGrid').innerHTML = `
+        <div class="vol-empty">
+          <div class="icon">🔍</div>
+          <h3>Registrate como voluntario para poder visualizar nuestros voluntariados disponibles!</h3>
+          <p>Ingresa a Mi Perfil > Quiero ser voluntario</p>
+        </div>`;
+      }
+    
     } catch (e) {
       document.getElementById('volGrid').innerHTML = `
         <div class="vol-empty">

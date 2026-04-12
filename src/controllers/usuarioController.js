@@ -171,7 +171,6 @@ exports.desactivarVoluntariado = async (req, res) => {
   }
 }
 
-// 🔥 OBTENER USUARIOS
 exports.getUsuarios = async (req, res) => {
   try {
     const db = await connectDB();
@@ -325,13 +324,33 @@ exports.validarCorreoRecuperacion = async (req, res) => {
   }
 };
 
+exports.obtenerInfoUsuario = async (req, res) => {
+  try {
+
+      const { userId } = req.body;
+
+      const db = await connectDB();
+
+    const usuario = await db
+      .collection("usuarios")
+      .findOne({ _id: new ObjectId(userId) });
+
+    res.json(usuario);  
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error al obtener usuario"
+    });
+  }
+};
 
 async function enviarCorreoTemporal(correo, passwordTemporal) {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "faunalink4@gmail.com",        // 🔴 tu correo
-      pass: "czce oxke srio zyhg"      // 🔴 contraseña de aplicación
+      user: "faunalink4@gmail.com",       
+      pass: "czce oxke srio zyhg"     
     }
   });
 

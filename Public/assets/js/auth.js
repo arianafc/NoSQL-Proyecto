@@ -1,3 +1,4 @@
+
 function verificarSesion() {
 
   const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -12,6 +13,7 @@ function verificarSesion() {
 
   return true;
 }
+
 
 verificarSesion();
 

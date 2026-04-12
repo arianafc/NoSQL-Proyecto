@@ -3,8 +3,6 @@ const APIUsuario = 'http://localhost:3000/api/usuarios/';
 
 $(document).ready(function() {
 
-
-
  const usuario = JSON.parse(localStorage.getItem('usuario'));
     if (usuario.rol === 'admin' || usuario.rol === 'organizacion') {    
     $("#cardVoluntariado").addClass('d-none');
@@ -17,60 +15,70 @@ if (usuario.passwordTemporal) {
 
 }
 
-document.getElementById("formActualizarContrasenna").addEventListener("submit", function (e) {
+$('#formActualizarContrasenna').on('submit', function (e) {
   e.preventDefault();
 
-  const nueva = document.getElementById("contrasennaActualizar").value.trim();
-  const confirmar = document.getElementById("contrasennaConfirmarActualizar").value.trim();
+  const nueva = $('#contrasennaActualizar').val().trim();
+  const confirmar = $('#contrasennaConfirmarActualizar').val().trim();
 
+  // Validaciones
   if (!nueva || !confirmar) {
-  Swal.fire("Error", "Debes completar ambos campos", "warning");
-  return;
-}
+    Swal.fire('Error', 'Debes completar ambos campos', 'warning');
+    return;
+  }
 
-if (nueva.length < 6) {
-  Swal.fire(
-    "Contraseña inválida",
-    "La contraseña debe tener al menos 6 caracteres",
-    "warning"
-  );
-  return;
-}
+  if (nueva.length < 6) {
+    Swal.fire(
+      'Contraseña inválida',
+      'La contraseña debe tener al menos 6 caracteres',
+      'warning'
+    );
+    return;
+  }
 
-if (nueva !== confirmar) {
-  Swal.fire(
-    "Error",
-    "Las contraseñas no coinciden",
-    "error"
-  );
-  return;
-}
-  fetch(APIUsuario+"actualizarPassword", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
+  if (nueva !== confirmar) {
+    Swal.fire(
+      'Error',
+      'Las contraseñas no coinciden',
+      'error'
+    );
+    return;
+  }
+
+  $.ajax({
+    url: APIUsuario + 'actualizarPassword',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
       nuevoPassword: nueva,
       userId: usuario.id
-    })
-  })
-    .then(res => res.json())
-    .then(data => {
+    }),
+    success: function (data) {
+
       Swal.fire({
-        icon: "success",
-        title: "Contraseña actualizada",
-        text: data.message
+        icon: 'success',
+        title: 'Contraseña actualizada',
+        text: data.message || 'La contraseña fue actualizada correctamente'
       }).then(() => {
-        usuario.passwordTemporal === false;
+
+       
+        usuario.passwordTemporal = false;
+
+      
+        localStorage.setItem('usuario', JSON.stringify(usuario));
+
         location.reload();
       });
-    })
-    .catch(() => {
-      Swal.fire("Error", "No se pudo actualizar la contraseña", "error");
-    });
+    },
+    error: function () {
+      Swal.fire(
+        'Error',
+        'No se pudo actualizar la contraseña',
+        'error'
+      );
+    }
+  });
 });
-
 
 
 
@@ -120,6 +128,7 @@ if (usuario.voluntario) {
     usuario.habilidades.forEach(h => {
         $(`.habilidad[value="${h}"]`).prop('checked', true);
     });
+    console.log(usuario.habilidades);
   $("#disponibilidadVoluntario").val(usuario.disponibilidad);
 }
 

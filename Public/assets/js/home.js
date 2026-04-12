@@ -17,7 +17,7 @@ $('#cerrarSesion').click(function(e) {
   }).then((result) => {
     if (result.isConfirmed) {
       
-      // 🔥 borrar sesión
+    
       localStorage.removeItem('usuario');
 
       // redirigir
@@ -73,7 +73,7 @@ $("#formRegistro").submit(function(event) {
         success: function(response) {
             Swal.fire('¡Registro exitoso!', response.message, 'success')
             .then(() => {
-                window.location.href = '/login';
+                window.location.href = '/';
             });
         },
 
@@ -114,10 +114,10 @@ $("#formLogin").submit(function(event) {
 
                 const usuario = response.usuario;
 
-                // 🔥 guardamos sesión
+            
                 localStorage.setItem('usuario', JSON.stringify(usuario));
 
-                // 🔥 REDIRECCIÓN POR ROL
+            
                 if (usuario.rol === 'admin') {
                     window.location.href = '/admin';
                 } else {

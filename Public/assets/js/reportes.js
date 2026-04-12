@@ -1,5 +1,6 @@
 let evidenciasAEliminar = [];
-const usuario = JSON.parse(localStorage.getItem("usuario"));
+const usuario = JSON.parse(localStorage.getItem('usuario'));
+
 
 function getEstadoBadge(estado) {
   switch (estado) {
@@ -21,7 +22,7 @@ function getEstadoBadge(estado) {
 
 function cargarMisReportes() {
 
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+const usuario = JSON.parse(localStorage.getItem('usuario'));
   const usuarioId = usuario.id;
 
 
@@ -95,7 +96,7 @@ function cargarMisReportes() {
 
 function cargarReportes() {
 
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
 
   if (!usuario) {
     Swal.fire("Error", "Debe iniciar sesión", "error");
