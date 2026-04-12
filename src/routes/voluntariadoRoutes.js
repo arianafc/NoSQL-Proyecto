@@ -17,5 +17,6 @@ router.get('/activos',          ctrl.getVoluntariadosActivos);
 router.post('/:id/inscribir',       ctrl.inscribirseVoluntariado);
 router.get('/mis/:userId',          ctrl.getMisVoluntariados);
 router.post('/:id/desinscribir', ctrl.desinscribirseVoluntariado);
+router.get('/:id/inscritos', ctrl.getInscritosVoluntariado);
 
 module.exports = router;

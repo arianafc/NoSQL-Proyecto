@@ -320,12 +320,34 @@
 
 <!-- MODAL DETALLE -->
 <div class="v-modal-overlay" id="modalDetalle">
-  <div class="v-modal">
+  <div class="v-modal" style="max-width:680px;">
     <div class="v-modal-header">
-      <span class="v-modal-title">📋 Detalle del Voluntariado</span>
+      <span class="v-modal-title" id="modalDetalleTitulo">📋 Detalle del Voluntariado</span>
       <button class="v-modal-close" onclick="cerrarModal('modalDetalle')">✕</button>
     </div>
-    <div id="detalleVolContent">Cargando...</div>
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
+      <button class="tab-btn active" id="dtab-info-btn"
+              onclick="switchDetalleTab('info')"
+              style="padding:0.6rem 1.2rem;font-size:0.88rem;">
+        ℹ️ Información
+      </button>
+      <button class="tab-btn" id="dtab-inscritos-btn"
+              onclick="switchDetalleTab('inscritos')"
+              style="padding:0.6rem 1.2rem;font-size:0.88rem;">
+        👥 Postulados
+        <span id="badgeInscritos"
+              style="background:var(--primary);color:#fff;border-radius:999px;
+                     padding:0.1rem 0.55rem;font-size:0.7rem;margin-left:0.4rem;">0</span>
+      </button>
+    </div>
+    <div id="dtab-content-info">
+      <div id="detalleVolContent">Cargando...</div>
+    </div>
+    <div id="dtab-content-inscritos" style="display:none;">
+      <div id="inscritosContent">
+        <div class="v-empty"><div class="e-icon">⏳</div><p>Cargando postulados…</p></div>
+      </div>
+    </div>
     <div class="v-form-actions">
       <button class="v-btn v-btn-outline" onclick="cerrarModal('modalDetalle')">Cerrar</button>
     </div>
@@ -523,42 +545,125 @@
     });
   }
 
-  function verDetalleVol(id) {
-    const v = voluntariadosData.find(x => x._id === id);
-    if (!v) return;
-    const fmt = d => d ? new Date(d).toLocaleDateString('es-CR') : '—';
-    document.getElementById('detalleVolContent').innerHTML = `
-      <div class="detail-section">
-        <div class="detail-section-title">Información General</div>
-        <div class="detail-grid">
-          <div class="detail-item"><div class="d-label">Nombre</div><div class="d-val">${v.nombre||'—'}</div></div>
-          <div class="detail-item"><div class="d-label">Organización</div><div class="d-val">${v.organizacion||'—'}</div></div>
-          <div class="detail-item"><div class="d-label">Provincia</div><div class="d-val">${v.provincia||'—'}</div></div>
-          <div class="detail-item"><div class="d-label">Cantón</div><div class="d-val">${v.canton||'—'}</div></div>
-          <div class="detail-item" style="grid-column:1/-1"><div class="d-label">Dirección</div><div class="d-val">${v.direccion||'—'}</div></div>
-        </div>
+  function switchDetalleTab(tab) {
+  document.getElementById('dtab-content-info').style.display      = tab === 'info'      ? 'block' : 'none';
+  document.getElementById('dtab-content-inscritos').style.display  = tab === 'inscritos' ? 'block' : 'none';
+  document.getElementById('dtab-info-btn').classList.toggle('active',     tab === 'info');
+  document.getElementById('dtab-inscritos-btn').classList.toggle('active', tab === 'inscritos');
+}
+
+async function verDetalleVol(id) {
+  const v = voluntariadosData.find(x => x._id === id);
+  if (!v) return;
+
+  abrirModal('modalDetalle');
+  switchDetalleTab('info');
+
+  document.getElementById('modalDetalleTitulo').textContent = `📋 ${v.nombre}`;
+  document.getElementById('badgeInscritos').textContent     = (v.inscritos || []).length;
+  document.getElementById('inscritosContent').innerHTML     = `<div class="v-empty"><div class="e-icon">⏳</div><p>Cargando postulados…</p></div>`;
+
+  const fmt = d => d ? new Date(d).toLocaleDateString('es-CR') : '—';
+
+  document.getElementById('detalleVolContent').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">Información General</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="d-label">Nombre</div><div class="d-val">${v.nombre||'—'}</div></div>
+        <div class="detail-item"><div class="d-label">Organización</div><div class="d-val">${v.organizacion||'—'}</div></div>
+        <div class="detail-item"><div class="d-label">Provincia</div><div class="d-val">${v.provincia||'—'}</div></div>
+        <div class="detail-item"><div class="d-label">Cantón</div><div class="d-val">${v.canton||'—'}</div></div>
+        <div class="detail-item" style="grid-column:1/-1"><div class="d-label">Dirección</div><div class="d-val">${v.direccion||'—'}</div></div>
       </div>
-      <div class="detail-section">
-        <div class="detail-section-title">Descripción</div>
-        <p style="font-size:0.88rem;line-height:1.6">${v.descripcion||'—'}</p>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Descripción</div>
+      <p style="font-size:0.88rem;line-height:1.6">${v.descripcion||'—'}</p>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Logística</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="d-label">Fecha inicio</div><div class="d-val">${fmt(v.fechaInicio)}</div></div>
+        <div class="detail-item"><div class="d-label">Fecha fin</div><div class="d-val">${fmt(v.fechaFin)}</div></div>
+        <div class="detail-item"><div class="d-label">Cupo máximo</div><div class="d-val">${v.cupoMaximo ? v.cupoMaximo + ' personas' : 'Sin límite'}</div></div>
+        <div class="detail-item"><div class="d-label">Inscritos</div><div class="d-val">${(v.inscritos||[]).length} personas</div></div>
+        <div class="detail-item"><div class="d-label">Contacto</div><div class="d-val">${v.contacto||'—'}</div></div>
+        <div class="detail-item" style="grid-column:1/-1"><div class="d-label">Requisitos</div><div class="d-val">${v.requisitos||'—'}</div></div>
       </div>
-      <div class="detail-section">
-        <div class="detail-section-title">Logística</div>
-        <div class="detail-grid">
-          <div class="detail-item"><div class="d-label">Fecha inicio</div><div class="d-val">${fmt(v.fechaInicio)}</div></div>
-          <div class="detail-item"><div class="d-label">Fecha fin</div><div class="d-val">${fmt(v.fechaFin)}</div></div>
-          <div class="detail-item"><div class="d-label">Cupo máximo</div><div class="d-val">${v.cupoMaximo||'—'}</div></div>
-          <div class="detail-item"><div class="d-label">Contacto</div><div class="d-val">${v.contacto||'—'}</div></div>
-          <div class="detail-item" style="grid-column:1/-1"><div class="d-label">Requisitos</div><div class="d-val">${v.requisitos||'—'}</div></div>
-        </div>
-      </div>
-      <div class="detail-section">
-        <div class="detail-section-title">Estado</div>
-        <span class="status-badge ${v.estado==='activo'?'s-activo':'s-inactivo'}">${v.estado==='activo'?'● Activo':'● Inactivo'}</span>
-        <span style="font-size:0.82rem;color:var(--text-muted);margin-left:1rem">Registrado: ${fmt(v.fechaRegistro)}</span>
-      </div>`;
-    abrirModal('modalDetalle');
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Estado</div>
+      <span class="status-badge ${v.estado==='activo'?'s-activo':'s-inactivo'}">${v.estado==='activo'?'● Activo':'● Inactivo'}</span>
+      <span style="font-size:0.82rem;color:var(--text-muted);margin-left:1rem">Registrado: ${fmt(v.fechaRegistro)}</span>
+    </div>`;
+
+  cargarInscritos(id);
+}
+
+async function cargarInscritos(volId) {
+  const contenedor = document.getElementById('inscritosContent');
+  try {
+    const res  = await fetch(`/admin/voluntariados/${volId}/inscritos`);
+    if (!res.ok) throw new Error('Error ' + res.status);
+    const data = await res.json();
+
+    document.getElementById('badgeInscritos').textContent = data.length;
+
+    if (!data.length) {
+      contenedor.innerHTML = `<div class="v-empty"><div class="e-icon">🐾</div><p>Aún no hay postulados en este voluntariado.</p></div>`;
+      return;
+    }
+
+    contenedor.innerHTML = `
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;min-width:560px;">
+      <thead>
+        <tr style="background:var(--light-bg);">
+          <th style="padding:0.85rem 1rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">Voluntario</th>
+          <th style="padding:0.85rem 1rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">Teléfono</th>
+          <th style="padding:0.85rem 1rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">Cédula</th>
+          <th style="padding:0.85rem 1rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">Disponibilidad</th>
+          <th style="padding:0.85rem 1rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">Habilidades</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(u => {
+          const dv = (u.disponibilidad||'').toLowerCase();
+          let dClass = 'd-otro';
+          if (dv === 'siempre')           dClass = 'd-siempre';
+          else if (dv.includes('fin'))    dClass = 'd-fines';
+          else if (dv.includes('semana')) dClass = 'd-semana';
+
+          const habs     = u.habilidades || [];
+          const habsHtml = habs.length
+            ? habs.map(h => `<span class="v-badge badge-skill">${h}</span>`).join(' ')
+            : '<span style="color:var(--text-muted);font-size:0.78rem">—</span>';
+
+          return `
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:0.9rem 1rem;vertical-align:middle;">
+                <div class="user-cell">
+                  <div class="v-avatar">${u.nombre ? u.nombre.charAt(0).toUpperCase() : '?'}</div>
+                  <div>
+                    <div class="u-name">${u.nombre||'—'}</div>
+                    <div class="u-email">${u.email||'—'}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:0.9rem 1rem;font-size:0.88rem;vertical-align:middle;">${u.telefono||'—'}</td>
+              <td style="padding:0.9rem 1rem;font-size:0.88rem;vertical-align:middle;">${u.cedula||'—'}</td>
+              <td style="padding:0.9rem 1rem;vertical-align:middle;"><span class="disp-badge ${dClass}">${u.disponibilidad||'No especificada'}</span></td>
+              <td style="padding:0.9rem 1rem;vertical-align:middle;"><div class="v-badges" style="flex-wrap:wrap;gap:0.3rem;">${habsHtml}</div></td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+  } catch (e) {
+    console.error(e);
+    contenedor.innerHTML = `<div class="v-empty"><div class="e-icon">⚠️</div><p>Error cargando postulados</p></div>`;
   }
+}
 
   function abrirModalCrear() {
     ['c-nombre','c-org','c-canton','c-direccion','c-descripcion','c-fechaInicio','c-fechaFin','c-cupo','c-contacto','c-requisitos']
