@@ -105,3 +105,97 @@ exports.cambiarEstado = async (req, res) => {
     res.status(500).json({ message: 'Error al actualizar estado' });
   }
 };
+
+// GET — render vista de usuario (solo voluntariados activos)
+exports.renderVoluntariadosUsuario = async (req, res) => {
+  try {
+    res.render('pages/voluntariados-usuario');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error cargando la página de voluntariados');
+  }
+};
+
+exports.getVoluntariadosActivos = async (req, res) => {
+  try {
+    const db = await connectDB();
+    const voluntariados = await db
+      .collection('voluntariados')
+      .find({ estado: 'activo' })
+      .sort({ fechaRegistro: -1 })
+      .toArray();
+
+    res.json(voluntariados.map(v => ({ ...v, _id: v._id.toString() })));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error obteniendo voluntariados' });
+  }
+};
+
+exports.inscribirseVoluntariado = async (req, res) => {
+  try {
+    const db = await connectDB();
+    const { userId } = req.body;
+    const volId = new ObjectId(req.params.id);
+
+    const voluntariado = await db.collection('voluntariados').findOne({ _id: volId });
+
+    if (!voluntariado) return res.status(404).json({ message: 'Voluntariado no encontrado' });
+
+    // Verificar si ya está inscrito
+    const yaInscrito = (voluntariado.inscritos || []).includes(userId);
+    if (yaInscrito) return res.status(400).json({ message: 'Ya estás inscrito en este voluntariado' });
+
+    // Verificar cupo
+    const totalInscritos = (voluntariado.inscritos || []).length;
+    if (voluntariado.cupoMaximo && totalInscritos >= voluntariado.cupoMaximo) {
+      return res.status(400).json({ message: 'No hay cupos disponibles' });
+    }
+
+    // Inscribir: agregar userId al array inscritos
+    await db.collection('voluntariados').updateOne(
+      { _id: volId },
+      { $addToSet: { inscritos: userId } }
+    );
+
+    res.json({ message: 'Inscripción exitosa' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al inscribirse' });
+  }
+};
+
+// GET — voluntariados en los que está inscrito el usuario
+exports.getMisVoluntariados = async (req, res) => {
+  try {
+    const db = await connectDB();
+    const userId = req.params.userId;
+
+    const lista = await db.collection('voluntariados')
+      .find({ inscritos: userId })
+      .sort({ fechaInicio: 1 })
+      .toArray();
+
+    res.json(lista.map(v => ({ ...v, _id: v._id.toString() })));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error obteniendo tus voluntariados' });
+  }
+};
+
+exports.desinscribirseVoluntariado = async (req, res) => {
+  try {
+    const db = await connectDB();
+    const { userId } = req.body;
+
+    await db.collection('voluntariados').updateOne(
+      { _id: new ObjectId(req.params.id) },
+      { $pull: { inscritos: userId } }
+    );
+
+    res.json({ message: 'Te has salido del voluntariado correctamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al salir del voluntariado' });
+  }
+};

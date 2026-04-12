@@ -22,9 +22,8 @@ function cargarUsuarios() {
               <select class="form-select form-select-sm"
                 onchange="cambiarRol('${u._id}', this.value)">
                 
-                <option value="Usuario" ${u.rol === 'Usuario' ? 'selected' : ''}>Usuario</option>
-                <option value="Admin" ${u.rol === 'Admin' ? 'selected' : ''}>Admin</option>
-                <option value="Organizacion" ${u.rol === 'Organizacion' ? 'selected' : ''}>Organización</option>
+                <option value="Usuario" ${u.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
+                <option value="Admin" ${u.rol === 'admin' ? 'selected' : ''}>Admin</option>
 
               </select>
             </td>

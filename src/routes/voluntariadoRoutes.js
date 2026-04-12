@@ -2,12 +2,20 @@ const express = require('express');
 const router  = express.Router();
 const ctrl    = require('../controllers/voluntariadoController');
 
-// Agrega aquí tu middleware de verificación de admin, igual que en tus otras rutas
-// Ejemplo: const { verificarAdmin } = require('../middlewares/auth');
+// Admin — renderiza la vista EJS del admin
+router.get('/',                 ctrl.renderVoluntariados);
+router.post('/',                ctrl.crearVoluntariado);
+router.put('/:id',              ctrl.editarVoluntariado);
+router.patch('/:id/estado',     ctrl.cambiarEstado);
 
-router.get('/',         /* verificarAdmin, */ ctrl.renderVoluntariados);
-router.post('/',        /* verificarAdmin, */ ctrl.crearVoluntariado);
-router.put('/:id',      /* verificarAdmin, */ ctrl.editarVoluntariado);
-router.patch('/:id/estado', /* verificarAdmin, */ ctrl.cambiarEstado);
+// Usuario — renderiza la vista EJS del usuario
+router.get('/usuario',          ctrl.renderVoluntariadosUsuario);
+
+// API pública — devuelve JSON (para el fetch del EJS de usuario)
+router.get('/activos',          ctrl.getVoluntariadosActivos);
+
+router.post('/:id/inscribir',       ctrl.inscribirseVoluntariado);
+router.get('/mis/:userId',          ctrl.getMisVoluntariados);
+router.post('/:id/desinscribir', ctrl.desinscribirseVoluntariado);
 
 module.exports = router;

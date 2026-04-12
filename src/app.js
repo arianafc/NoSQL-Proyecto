@@ -71,6 +71,14 @@ app.get('/admin/reportes', (req, res) => {
 
 app.use('/admin/voluntariados', voluntariadoRoutes);
 
+app.get('/voluntariados', (req, res) => {
+  res.render('pages/voluntariados-usuario');
+});
+
+app.use('/api/voluntariados', voluntariadoRoutes);
+
+
+
 //  DB
 connectDB()
   .then(() => console.log(' Conectado a MongoDB Atlas'))
