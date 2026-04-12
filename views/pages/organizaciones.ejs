@@ -3,6 +3,70 @@
 
   <h2 class="mb-4">ORGANIZACIONES ALIADAS</h2>
   <span>Conoce las organizaciones aliadas de FaunaLink</span>
+  <div class="row mt-4" id="contenedorOrganizaciones">
+     <div class="row mt-4" id="contenedorOrganizaciones">
+
+  <% if (organizaciones && organizaciones.length > 0) { %>
+
+    <% organizaciones.forEach(o => { %>
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+
+          <div class="card-body">
+
+            <!-- Nombre -->
+            <h5 class="card-title mb-2">
+              <%= o.nombre %>
+            </h5>
+
+            <!-- Tipo -->
+            <p class="text-muted mb-2">
+              <%= o.tipo %>
+            </p>
+
+            <!-- Estado -->
+            <p>
+              <% if (o.verificado) { %>
+                <span class="badge bg-success">Verificado</span>
+              <% } else { %>
+                <span class="badge bg-warning text-dark">Pendiente</span>
+              <% } %>
+            </p>
+
+            <hr>
+
+            <!-- Info -->
+            <p class="mb-1">
+              <strong>📧</strong> <%= o.correo %>
+            </p>
+
+            <p class="mb-1">
+              <strong>📞</strong> <%= o.telefono || 'No disponible' %>
+            </p>
+
+            <% if (o.direccion) { %>
+              <p class="mb-0">
+                <strong>📍</strong> <%= o.direccion %>
+              </p>
+            <% } %>
+
+          </div>
+
+        </div>
+      </div>
+    <% }) %>
+
+  <% } else { %>
+
+    <div class="col-12">
+      <div class="alert alert-info text-center">
+        No hay organizaciones disponibles
+      </div>
+    </div>
+
+  <% } %>
+
+</div>
   <hr>
 
     <div class="row">
@@ -191,4 +255,5 @@
 
 <script src="/assets/vendor/libs/jquery/jquery.js"></script>
 <script src="/assets/js/reportes.js"></script>
+
 </div>

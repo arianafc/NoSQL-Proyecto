@@ -134,3 +134,29 @@ exports.obtenerOrganizaciones = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.vistaOrganizacionesUs = async (req, res) => {
+  try {
+    const db = await connectDB();
+
+    const organizaciones = await db
+      .collection('organizaciones')
+      .find()
+      .toArray();
+
+    res.render('pages/organizaciones', {
+      organizaciones,
+      error: null,
+      exito: null
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.render('pages/organizaciones', {
+      organizaciones: [],
+      error: 'Error al obtener organizaciones',
+      exito: null
+    });
+  }
+};
