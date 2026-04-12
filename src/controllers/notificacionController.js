@@ -146,3 +146,22 @@ exports.eliminarNotificacion = async (req, res) => {
     });
   }
 };
+
+exports.obtenerNotificacionesUsuario = async (req, res) => {
+  try {
+    const db = await connectDB();
+
+    const notificaciones = await db
+      .collection('notificaciones')
+      .find({ leido: false })
+      .sort({ fecha_creacion: -1 })
+      .limit(10)
+      .toArray();
+
+    res.json(notificaciones);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};

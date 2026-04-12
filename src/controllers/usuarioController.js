@@ -64,7 +64,6 @@ exports.loginUsuario = async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    // 🚫 BLOQUEAR SI ESTÁ INACTIVO
     if (!usuario.estado) {
       return res.status(403).json({ message: 'Usuario inactivo, contacte al administrador' });
     }
@@ -148,6 +147,29 @@ exports.serVoluntario = async (req, res) => {
   }
 };
 
+
+exports.desactivarVoluntariado = async (req, res) => {
+   try {
+    const { userId } = req.body;
+
+    const db = await connectDB();
+
+    await db.collection('usuarios').updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          voluntario: false,
+         
+        }
+      }
+    );
+
+    res.json({ message: 'Ya no eres voluntario de FaunaLink' });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 // 🔥 OBTENER USUARIOS
 exports.getUsuarios = async (req, res) => {

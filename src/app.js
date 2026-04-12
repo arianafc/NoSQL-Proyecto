@@ -38,9 +38,9 @@ app.get('/reportes', (req, res) => {
   res.render('pages/reportes-usuario');
 });
 
-app.get('/organizaciones', (req, res) => {
-  res.render('pages/organizaciones');
-});
+const organizacionController = require('./controllers/organizacionController');
+
+app.get('/organizaciones', organizacionController.vistaOrganizacionesUs);
 
 app.get('/perfil', (req, res) => {
   res.render('pages/perfil');
@@ -91,6 +91,8 @@ connectDB()
 // API
 app.use('/api/reportes', reporteRoutes);
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api', notificacionRoutes);
+app.use('/api/organizaciones', organizacionRoutes);
 app.use('/admin', organizacionRoutes);
 app.use('/admin', notificacionRoutes);
 
