@@ -1,63 +1,82 @@
-<div class="container-xxl flex-grow-1 container-p-y">
+<div class="content-wrapper">
+  <div class="container-xxl flex-grow-1 container-p-y">
 
-  <h4 class="fw-bold py-3 mb-4">
-    📊 Panel de Administración
-  </h4>
+    <!-- Bienvenida -->
+    <div class="card mb-4" style="background: linear-gradient(135deg, #2d6a4f 0%, #40916c 60%, #52b788 100%); border: none;">
+      <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h4 class="text-white mb-1" id="saludo">¡Bienvenido a FaunaLink! 🐾</h4>
+          <p class="mb-0" style="color:rgba(255,255,255,.8); font-size:.95rem;">
+            Plataforma de gestión comunitaria para la protección y rescate animal en Costa Rica.
+          </p>
+        </div>
+        <div style="font-size:5rem; opacity:.15;">🐾</div>
+      </div>
+    </div>
 
-  <div class="row">
+    <!-- Sobre FaunaLink -->
+    <div class="row g-4 mb-4">
+      <div class="col-12 col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div style="font-size:2.2rem; margin-bottom:12px;">🐾</div>
+            <h6 class="fw-bold mb-2">Reportes de animales</h6>
+            <p class="text-muted mb-0" style="font-size:.85rem; line-height:1.6;">
+              Cualquier persona puede reportar animales en situación de riesgo, abandono o emergencia para que reciban atención oportuna.
+            </p>
+          </div>
+        </div>
+      </div>
 
-    <!-- Usuarios -->
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-body text-center">
-          <h5>Usuarios</h5>
-          <p class="text-muted">Gestionar usuarios del sistema</p>
-          <a href="/admin/usuarios" class="btn btn-primary">
-            Ir a Usuarios
-          </a>
+      <div class="col-12 col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div style="font-size:2.2rem; margin-bottom:12px;">🤝</div>
+            <h6 class="fw-bold mb-2">Red de voluntarios</h6>
+            <p class="text-muted mb-0" style="font-size:.85rem; line-height:1.6;">
+              Conectamos a voluntarios con organizaciones y casos activos según sus habilidades y disponibilidad, optimizando cada rescate.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div style="font-size:2.2rem; margin-bottom:12px;">🏠</div>
+            <h6 class="fw-bold mb-2">Organizaciones y refugios</h6>
+            <p class="text-muted mb-0" style="font-size:.85rem; line-height:1.6;">
+              Refugios y asociaciones registradas gestionan sus casos, publican necesidades y coordinan donaciones desde la plataforma.
+            </p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ONG -->
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-body text-center">
-          <h5>Organizaciones</h5>
-          <p class="text-muted">Gestionar ONGs</p>
-          <a href="/admin/organizaciones" class="btn btn-primary">
-            Ir a Organizaciones
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Reportes -->
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-body text-center">
-          <h5>Reportes</h5>
-          <p class="text-muted">Ver estadísticas</p>
-          <button class="btn btn-secondary" disabled>
-            Próximamente
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notificaciones -->
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-body text-center">
-          <h5>Notificaciones</h5>
-          <p class="text-muted">Gestionar notificaciones</p>
-          <a href="/admin/notificaciones" class="btn btn-primary">
-            Ir a Notificaciones
-          </a>
-        </div>
+    <!-- Frase -->
+    <div class="card border-0" style="background:#f6f9f7;">
+      <div class="card-body text-center py-5">
+        <div style="font-size:2rem; margin-bottom:12px;">🐶 🐱 🐢</div>
+        <h5 class="fw-bold mb-2" style="color:#2d6a4f;">Cada reporte cuenta. Cada voluntario importa.</h5>
+        <p class="text-muted mb-0" style="max-width:500px; margin:0 auto; font-size:.9rem; line-height:1.7;">
+          FaunaLink conecta a personas con corazón para proteger a los animales que no tienen voz.
+          Gracias por ser parte de esta comunidad.
+        </p>
       </div>
     </div>
 
   </div>
-
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = localStorage.getItem('usuario');
+    if (raw) {
+      const u = JSON.parse(raw);
+      const nombre = u.nombre?.split(' ')[0] || '';
+      const hora = new Date().getHours();
+      const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+      document.getElementById('saludo').textContent = `${saludo}, ${nombre}! 🐾`;
+    }
+  });
+</script>

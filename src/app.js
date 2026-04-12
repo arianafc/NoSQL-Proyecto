@@ -12,6 +12,8 @@ const voluntariadoRoutes = require('./routes/voluntariadoRoutes');
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+const donacionRoutes = require('./routes/donacionRoutes');
+
 
 // Middlewares
 app.use(cors());
@@ -77,7 +79,9 @@ app.get('/voluntariados', (req, res) => {
 
 app.use('/api/voluntariados', voluntariadoRoutes);
 
-
+app.get('/admin/donaciones', (req, res) => res.render('pages/admin-donaciones'));
+app.use('/api/donaciones', donacionRoutes);
+app.get('/donaciones', (req, res) => res.render('pages/donaciones-usuario'));
 
 //  DB
 connectDB()

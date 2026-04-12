@@ -1,0 +1,381 @@
+<style>
+  :root {
+    --primary: #6c63ff;
+    --primary-dark: #5a52d5;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --light-bg: #f4f5f7;
+    --card-bg: #ffffff;
+    --text-main: #1e1e2e;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+  }
+
+  .don-section { padding: 1.5rem; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--card-bg); border-radius: 12px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .stat-card .s-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; font-weight: 600; }
+  .stat-card .s-value { font-size: 2rem; font-weight: 700; }
+
+  .filters-bar { background: var(--card-bg); border-radius: 12px; padding: 1rem 1.5rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .v-search { flex: 1; min-width: 200px; padding: 0.5rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+  .v-search:focus { border-color: var(--primary); }
+  .v-select { padding: 0.5rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.88rem; background: #fff; cursor: pointer; outline: none; }
+
+  .periodo-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .p-tab { padding: 0.4rem 1rem; border-radius: 8px; border: 1.5px solid var(--border); background: #fff; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+  .p-tab.activo { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .v-btn { padding: 0.45rem 1rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.84rem; font-weight: 600; transition: opacity 0.18s, transform 0.1s; display: inline-flex; align-items: center; gap: 0.35rem; }
+  .v-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .v-btn-primary { background: var(--primary); color: #fff; }
+  .v-btn-outline { background: transparent; border: 1.5px solid var(--primary); color: var(--primary); }
+
+  .table-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
+  .table-card table { width: 100%; border-collapse: collapse; }
+  .table-card thead { background: var(--light-bg); }
+  .table-card th { padding: 0.85rem 1rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; text-align: left; border-bottom: 1px solid var(--border); }
+  .table-card td { padding: 0.9rem 1rem; font-size: 0.88rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .table-card tr:last-child td { border-bottom: none; }
+  .table-card tr:hover td { background: #f9f9ff; }
+
+  .u-name  { font-weight: 600; font-size: 0.88rem; }
+  .u-email { font-size: 0.75rem; color: var(--text-muted); }
+  .monto-val { font-weight: 700; color: #15803d; }
+
+  .v-badge { padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.73rem; font-weight: 600; }
+  .badge-economica  { background: #dcfce7; color: #15803d; }
+  .badge-especie    { background: #fef9c3; color: #854d0e; }
+  .badge-confirmada { background: #dcfce7; color: #15803d; }
+  .badge-pendiente  { background: #fef3c7; color: #92400e; }
+  .badge-cancelada  { background: #fee2e2; color: #b91c1c; }
+
+  .estado-sel { padding: 0.25rem 0.5rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.82rem; cursor: pointer; outline: none; background: #fff; }
+  .estado-sel:focus { border-color: var(--primary); }
+
+  .v-empty { text-align: center; padding: 3rem 2rem; color: var(--text-muted); }
+  .v-empty .e-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+  .v-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2000; align-items: center; justify-content: center; }
+  .v-modal-overlay.active { display: flex; }
+  .v-modal { background: #fff; border-radius: 16px; padding: 2rem; width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); animation: vSlideUp 0.22s ease; }
+  @keyframes vSlideUp { from { transform: translateY(28px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+  .v-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .v-modal-title { font-size: 1.1rem; font-weight: 700; }
+  .v-modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted); line-height: 1; }
+
+  .v-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .v-form-group { margin-bottom: 1rem; }
+  .v-form-label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted); }
+  .v-form-control { width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.88rem; outline: none; font-family: inherit; box-sizing: border-box; transition: border-color 0.2s; }
+  .v-form-control:focus { border-color: var(--primary); }
+  textarea.v-form-control { resize: vertical; min-height: 80px; }
+  .v-form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+  .v-toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+  .v-toast { padding: 0.8rem 1.2rem; border-radius: 10px; color: #fff; font-size: 0.87rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.15); animation: vFadeUp 0.28s ease; }
+  .v-toast-success { background: var(--success); }
+  .v-toast-error   { background: var(--danger); }
+  @keyframes vFadeUp { from { transform: translateY(16px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+</style>
+
+<div class="don-section">
+
+  <!-- HEADER -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <h2 style="margin:0; font-weight:700;">Gestión de Donaciones</h2>
+    <button class="v-btn v-btn-primary" onclick="abrirModal()">➕ Nueva Donación</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="s-label">Total recaudado</div>
+      <div class="s-value" style="color:var(--primary)" id="statTotal">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-label">Donaciones</div>
+      <div class="s-value" style="color:var(--success)" id="statCantidad">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-label">Promedio</div>
+      <div class="s-value" style="color:var(--warning)" id="statPromedio">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-label">Mayor donación</div>
+      <div class="s-value" style="color:var(--danger)" id="statMax">—</div>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filters-bar">
+    <input type="text" class="v-search" id="buscador" placeholder="🔍 Buscar por donante u organización…" oninput="filtrar()">
+    <select class="v-select" id="filtroTipo" onchange="filtrar()">
+      <option value="">Todos los tipos</option>
+      <option value="economica">Económica</option>
+      <option value="especie">En especie</option>
+    </select>
+    <select class="v-select" id="filtroEstado" onchange="filtrar()">
+      <option value="">Todos los estados</option>
+      <option value="confirmada">Confirmada</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="cancelada">Cancelada</option>
+    </select>
+  </div>
+
+  <!-- PERIODO TABS -->
+  <div class="periodo-tabs">
+    <button class="p-tab activo" onclick="cambiarPeriodo('mes',  this)">Por mes</button>
+    <button class="p-tab"        onclick="cambiarPeriodo('dia',  this)">Por día</button>
+    <button class="p-tab"        onclick="cambiarPeriodo('anio', this)">Por año</button>
+    <button class="p-tab"        onclick="cambiarPeriodo('todo', this)">Todos</button>
+  </div>
+
+  <!-- TABLA -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Donante</th>
+          <th>Organización</th>
+          <th>Tipo</th>
+          <th>Monto</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Detalle</th>
+        </tr>
+      </thead>
+      <tbody id="donTabla">
+        <tr><td colspan="7">
+          <div class="v-empty"><div class="e-icon">⏳</div><p>Cargando donaciones…</p></div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="v-modal-overlay" id="modalDonacion">
+  <div class="v-modal">
+    <div class="v-modal-header">
+      <span class="v-modal-title">➕ Registrar Donación</span>
+      <button class="v-modal-close" onclick="cerrarModal()">✕</button>
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Nombre del donante</label>
+        <input type="text" id="fNombre" class="v-form-control" placeholder="Nombre completo">
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Tipo de donación</label>
+        <select id="fTipo" class="v-form-control" onchange="toggleMonto()">
+          <option value="economica">Económica</option>
+          <option value="especie">En especie</option>
+        </select>
+      </div>
+    </div>
+    <div class="v-form-group" id="fMontoGroup">
+      <label class="v-form-label">Monto (₡)</label>
+      <input type="number" id="fMonto" class="v-form-control" placeholder="0" min="1">
+    </div>
+    <div class="v-form-row">
+      <div class="v-form-group">
+        <label class="v-form-label">Organización destino</label>
+        <input type="text" id="fOrganizacion" class="v-form-control" placeholder="FaunaLink General">
+      </div>
+      <div class="v-form-group">
+        <label class="v-form-label">Estado inicial</label>
+        <select id="fEstado" class="v-form-control">
+          <option value="confirmada">Confirmada</option>
+          <option value="pendiente">Pendiente</option>
+        </select>
+      </div>
+    </div>
+    <div class="v-form-group">
+      <label class="v-form-label">Descripción / detalle</label>
+      <textarea id="fDescripcion" class="v-form-control" placeholder="Detalle de la donación…"></textarea>
+    </div>
+    <div class="v-form-group" style="display:flex;align-items:center;gap:0.5rem;">
+      <input type="checkbox" id="fAnonima" style="width:16px;height:16px;cursor:pointer;">
+      <label for="fAnonima" class="v-form-label" style="margin:0;cursor:pointer;">Donación anónima</label>
+    </div>
+    <div class="v-form-actions">
+      <button class="v-btn v-btn-outline" onclick="cerrarModal()">Cancelar</button>
+      <button class="v-btn v-btn-primary" onclick="guardarDonacion()">Registrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="v-toast-container" id="vToastContainer"></div>
+
+<script>
+  let donaciones = [];
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await Promise.all([cargarDonaciones(), cargarResumen()]);
+  });
+
+  async function cargarDonaciones() {
+    try {
+      const res = await fetch('/api/donaciones');
+      if (!res.ok) throw new Error();
+      donaciones = await res.json();
+      renderTabla(donaciones);
+    } catch (e) {
+      document.getElementById('donTabla').innerHTML = `
+        <tr><td colspan="7">
+          <div class="v-empty"><div class="e-icon">⚠️</div><p>No se pudieron cargar las donaciones</p></div>
+        </td></tr>`;
+    }
+  }
+
+  async function cargarResumen() {
+    try {
+      const res  = await fetch('/api/donaciones/resumen');
+      const data = await res.json();
+      const r    = data.resumen || {};
+      document.getElementById('statTotal').textContent    = fmt(r.totalMonto    || 0);
+      document.getElementById('statCantidad').textContent = r.totalDonaciones   || 0;
+      document.getElementById('statPromedio').textContent = fmt(r.promedioMonto || 0);
+      document.getElementById('statMax').textContent      = fmt(r.maxMonto      || 0);
+    } catch (e) {}
+  }
+
+  function renderTabla(lista) {
+    const tbody = document.getElementById('donTabla');
+    if (!lista.length) {
+      tbody.innerHTML = `
+        <tr><td colspan="7">
+          <div class="v-empty"><div class="e-icon">🔍</div><p>No hay donaciones que coincidan</p></div>
+        </td></tr>`;
+      return;
+    }
+    tbody.innerHTML = lista.map(d => {
+      const nombre = d.anonima ? 'Anónimo' : (d.usuario?.nombre || d.nombreDonante || 'Anónimo');
+      const email  = d.anonima ? '' : (d.usuario?.email || '');
+      const fecha  = new Date(d.fecha).toLocaleDateString('es-CR');
+      const monto  = d.tipo === 'especie' ? '—' : fmt(d.monto);
+      return `
+        <tr>
+          <td>
+            <div class="u-name">${nombre}</div>
+            ${email ? `<div class="u-email">${email}</div>` : ''}
+          </td>
+          <td>${d.organizacion || 'FaunaLink General'}</td>
+          <td><span class="v-badge badge-${d.tipo}">${d.tipo === 'especie' ? 'En especie' : 'Económica'}</span></td>
+          <td class="monto-val">${monto}</td>
+          <td>${fecha}</td>
+          <td>
+            <select class="estado-sel" onchange="cambiarEstado('${d._id}', this.value)">
+              <option value="confirmada" ${d.estado==='confirmada'?'selected':''}>Confirmada</option>
+              <option value="pendiente"  ${d.estado==='pendiente' ?'selected':''}>Pendiente</option>
+              <option value="cancelada"  ${d.estado==='cancelada' ?'selected':''}>Cancelada</option>
+            </select>
+          </td>
+          <td><small style="color:var(--text-muted)">${d.descripcion ? d.descripcion.substring(0,40)+'…' : '—'}</small></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function filtrar() {
+    const q = document.getElementById('buscador').value.toLowerCase();
+    const t = document.getElementById('filtroTipo').value;
+    const e = document.getElementById('filtroEstado').value;
+    renderTabla(donaciones.filter(d => {
+      const nombre = (d.usuario?.nombre || d.nombreDonante || '').toLowerCase();
+      const org    = (d.organizacion || '').toLowerCase();
+      return (!q || nombre.includes(q) || org.includes(q))
+          && (!t || d.tipo === t)
+          && (!e || d.estado === e);
+    }));
+  }
+
+  function cambiarPeriodo(periodo, btn) {
+    document.querySelectorAll('.p-tab').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    const ahora = new Date();
+    const base  = periodo === 'todo' ? donaciones : donaciones.filter(d => {
+      const f = new Date(d.fecha);
+      if (periodo === 'dia')  return f.toDateString() === ahora.toDateString();
+      if (periodo === 'mes')  return f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear();
+      if (periodo === 'anio') return f.getFullYear() === ahora.getFullYear();
+    });
+    renderTabla(base);
+  }
+
+  async function cambiarEstado(id, estado) {
+    try {
+      await fetch(`/api/donaciones/${id}/estado`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado })
+      });
+      const d = donaciones.find(x => x._id === id);
+      if (d) d.estado = estado;
+      showToast('Estado actualizado ✓', 'success');
+    } catch (e) { showToast('Error al actualizar', 'error'); }
+  }
+
+  function abrirModal() {
+    document.getElementById('modalDonacion').classList.add('active');
+  }
+  function cerrarModal() {
+    document.getElementById('modalDonacion').classList.remove('active');
+    ['fNombre','fMonto','fOrganizacion','fDescripcion'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fTipo').value   = 'economica';
+    document.getElementById('fEstado').value = 'confirmada';
+    document.getElementById('fAnonima').checked = false;
+    document.getElementById('fMontoGroup').style.display = 'block';
+  }
+  document.getElementById('modalDonacion').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalDonacion')) cerrarModal();
+  });
+
+  function toggleMonto() {
+    document.getElementById('fMontoGroup').style.display =
+      document.getElementById('fTipo').value === 'especie' ? 'none' : 'block';
+  }
+
+  async function guardarDonacion() {
+    const tipo  = document.getElementById('fTipo').value;
+    const monto = document.getElementById('fMonto').value;
+    if (tipo === 'economica' && (!monto || parseFloat(monto) <= 0)) {
+      showToast('Ingresá un monto válido', 'error'); return;
+    }
+    try {
+      const res = await fetch('/api/donaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombreDonante: document.getElementById('fNombre').value || 'Anónimo',
+          tipo,
+          monto:        parseFloat(monto) || 0,
+          organizacion: document.getElementById('fOrganizacion').value || 'FaunaLink General',
+          descripcion:  document.getElementById('fDescripcion').value,
+          estado:       document.getElementById('fEstado').value,
+          anonima:      document.getElementById('fAnonima').checked
+        })
+      });
+      if (!res.ok) { showToast('Error al registrar', 'error'); return; }
+      cerrarModal();
+      showToast('Donación registrada ✓', 'success');
+      await Promise.all([cargarDonaciones(), cargarResumen()]);
+    } catch (e) { showToast('Error de conexión', 'error'); }
+  }
+
+  function fmt(n) {
+    return '₡' + Number(n).toLocaleString('es-CR', { minimumFractionDigits: 0 });
+  }
+
+  function showToast(msg, tipo = 'success') {
+    const tc = document.getElementById('vToastContainer');
+    const t  = document.createElement('div');
+    t.className = `v-toast v-toast-${tipo}`;
+    t.textContent = msg;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+</script>

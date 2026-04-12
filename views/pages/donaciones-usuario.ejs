@@ -1,0 +1,423 @@
+<style>
+  :root {
+    --primary: #6c63ff;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --light-bg: #f4f5f7;
+    --card-bg: #ffffff;
+    --text-main: #1e1e2e;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+  }
+
+  .don-section { padding: 1.5rem; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--card-bg); border-radius: 12px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .stat-card .s-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; font-weight: 600; }
+  .stat-card .s-value { font-size: 2rem; font-weight: 700; }
+
+  .info-sinpe {
+    background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+    border: 1.5px solid #c4b5fd;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .info-sinpe h3 { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; }
+  .cuentas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .cuenta-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    border: 1px solid #ddd6fe;
+    display: flex; flex-direction: column; gap: 0.3rem;
+  }
+  .cuenta-tipo { font-size: 0.72rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .cuenta-banco { font-size: 0.88rem; font-weight: 600; color: var(--text-main); }
+  .cuenta-numero {
+    font-size: 1rem; font-weight: 700; color: var(--text-main);
+    letter-spacing: 1px; font-family: monospace;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-copiar {
+    background: none; border: none; cursor: pointer;
+    font-size: 0.85rem; color: var(--primary);
+    padding: 0; transition: opacity 0.2s;
+  }
+  .btn-copiar:hover { opacity: 0.7; }
+  .cuenta-nombre { font-size: 0.78rem; color: var(--text-muted); }
+
+  .filters-bar { background: var(--card-bg); border-radius: 12px; padding: 1rem 1.5rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .v-search { flex: 1; min-width: 200px; padding: 0.5rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+  .v-search:focus { border-color: var(--primary); }
+
+  .v-btn { padding: 0.45rem 1rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.84rem; font-weight: 600; transition: opacity 0.18s, transform 0.1s; display: inline-flex; align-items: center; gap: 0.35rem; }
+  .v-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .v-btn-primary { background: var(--primary); color: #fff; }
+  .v-btn-outline { background: transparent; border: 1.5px solid var(--primary); color: var(--primary); }
+
+  .table-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
+  .table-card table { width: 100%; border-collapse: collapse; }
+  .table-card thead { background: var(--light-bg); }
+  .table-card th { padding: 0.85rem 1rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; text-align: left; border-bottom: 1px solid var(--border); }
+  .table-card td { padding: 0.9rem 1rem; font-size: 0.88rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .table-card tr:last-child td { border-bottom: none; }
+  .table-card tr:hover td { background: #f9f9ff; }
+
+  .monto-val { font-weight: 700; color: #15803d; }
+
+  .v-badge { padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.73rem; font-weight: 600; }
+  .badge-confirmada { background: #dcfce7; color: #15803d; }
+  .badge-pendiente  { background: #fef3c7; color: #92400e; }
+  .badge-cancelada  { background: #fee2e2; color: #b91c1c; }
+  .badge-sinpe      { background: #ede9fe; color: #5b21b6; }
+  .badge-transferencia { background: #dbeafe; color: #1d4ed8; }
+
+  .v-empty { text-align: center; padding: 3rem 2rem; color: var(--text-muted); }
+  .v-empty .e-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+  .v-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
+  .v-modal-overlay.active { display: flex; }
+  .v-modal { background: #fff; border-radius: 16px; padding: 2rem; width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); animation: vSlideUp 0.22s ease; }
+  @keyframes vSlideUp { from { transform: translateY(28px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+  .v-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .v-modal-title { font-size: 1.1rem; font-weight: 700; }
+  .v-modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted); line-height: 1; }
+
+  .metodo-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; }
+  .metodo-tab { flex: 1; padding: 0.6rem; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; text-align: center; }
+  .metodo-tab.activo { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .info-pago {
+    background: #f5f3ff; border: 1px solid #ddd6fe;
+    border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1rem;
+    font-size: 0.85rem; line-height: 1.7;
+  }
+  .info-pago strong { color: var(--primary); }
+
+  .v-form-group { margin-bottom: 1rem; }
+  .v-form-label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted); }
+  .v-form-control { width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.88rem; outline: none; font-family: inherit; box-sizing: border-box; transition: border-color 0.2s; }
+  .v-form-control:focus { border-color: var(--primary); }
+  textarea.v-form-control { resize: vertical; min-height: 70px; }
+  .v-form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+  .aviso-pendiente {
+    background: #fefce8; border: 1px solid #fde68a;
+    border-radius: 8px; padding: 0.75rem 1rem;
+    font-size: 0.82rem; color: #78350f; margin-bottom: 1rem;
+    display: flex; gap: 0.5rem; align-items: flex-start;
+  }
+
+  .v-toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+  .v-toast { padding: 0.8rem 1.2rem; border-radius: 10px; color: #fff; font-size: 0.87rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.15); animation: vFadeUp 0.28s ease; }
+  .v-toast-success { background: var(--success); }
+  .v-toast-error   { background: var(--danger); }
+  @keyframes vFadeUp { from { transform: translateY(16px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+</style>
+
+<div class="don-section">
+
+  <!-- HEADER -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <div>
+      <h2 style="margin:0; font-weight:700;">Mis Donaciones</h2>
+      <p style="margin:0.3rem 0 0; color:var(--text-muted); font-size:0.9rem;">Tu historial de donaciones a FaunaLink.</p>
+    </div>
+    <button class="v-btn v-btn-primary" onclick="abrirModal()">➕ Nueva Donación</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="s-label">Total donado</div>
+      <div class="s-value" style="color:var(--primary)" id="statTotal">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-label">Donaciones</div>
+      <div class="s-value" style="color:var(--success)" id="statCantidad">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-label">Confirmadas</div>
+      <div class="s-value" style="color:var(--success)" id="statConfirmadas">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-label">Pendientes</div>
+      <div class="s-value" style="color:var(--warning)" id="statPendientes">—</div>
+    </div>
+  </div>
+
+  <!-- INFO CUENTAS -->
+  <div class="info-sinpe">
+    <h3>📋 Cuentas oficiales de FaunaLink</h3>
+    <div class="cuentas-grid">
+      <div class="cuenta-card">
+        <div class="cuenta-tipo">📱 SINPE Móvil</div>
+        <div class="cuenta-banco">Cualquier operador</div>
+        <div class="cuenta-numero">
+          8888-8888
+          <button class="btn-copiar" onclick="copiar('8888-8888')" title="Copiar">📋</button>
+        </div>
+        <div class="cuenta-nombre">FaunaLink CR</div>
+      </div>
+      <div class="cuenta-card">
+        <div class="cuenta-tipo">🏦 Transferencia — BAC</div>
+        <div class="cuenta-banco">BAC San José</div>
+        <div class="cuenta-numero">
+          102-000-000000
+          <button class="btn-copiar" onclick="copiar('102000000000')" title="Copiar">📋</button>
+        </div>
+        <div class="cuenta-nombre">FaunaLink S.A. — IBAN: CR00 0010 2000 0000 0000 00</div>
+      </div>
+      <div class="cuenta-card">
+        <div class="cuenta-tipo">🏦 Transferencia — BCR</div>
+        <div class="cuenta-banco">Banco de Costa Rica</div>
+        <div class="cuenta-numero">
+          001-000-000000
+          <button class="btn-copiar" onclick="copiar('001000000000')" title="Copiar">📋</button>
+        </div>
+        <div class="cuenta-nombre">FaunaLink S.A. — IBAN: CR00 0015 1000 0000 0000 00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTRO -->
+  <div class="filters-bar">
+    <input type="text" class="v-search" id="buscador" placeholder="🔍 Buscar por comprobante o método…" oninput="filtrar()">
+    <select style="padding:0.5rem 1rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.88rem;background:#fff;outline:none;"
+            id="filtroEstado" onchange="filtrar()">
+      <option value="">Todos los estados</option>
+      <option value="confirmada">Confirmada</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="cancelada">Cancelada</option>
+    </select>
+  </div>
+
+  <!-- TABLA -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Método</th>
+          <th>Comprobante</th>
+          <th>Monto</th>
+          <th>Estado</th>
+          <th>Nota</th>
+        </tr>
+      </thead>
+      <tbody id="donTabla">
+        <tr><td colspan="6">
+          <div class="v-empty"><div class="e-icon">⏳</div><p>Cargando tus donaciones…</p></div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MODAL NUEVA DONACIÓN -->
+<div class="v-modal-overlay" id="modalDonacion">
+  <div class="v-modal">
+    <div class="v-modal-header">
+      <span class="v-modal-title">💝 Registrar Donación</span>
+      <button class="v-modal-close" onclick="cerrarModal()">✕</button>
+    </div>
+
+    <div class="aviso-pendiente">
+      ⚠️ Tu donación quedará en estado <strong>Pendiente</strong> hasta que el equipo de FaunaLink verifique el comprobante. Esto puede tomar hasta 24 horas hábiles.
+    </div>
+
+    <!-- Método de pago -->
+    <div class="v-form-group">
+      <label class="v-form-label">Método de pago</label>
+      <div class="metodo-tabs">
+        <button class="metodo-tab activo" id="tab-sinpe" onclick="seleccionarMetodo('sinpe', this)">📱 SINPE Móvil</button>
+        <button class="metodo-tab" id="tab-transferencia" onclick="seleccionarMetodo('transferencia', this)">🏦 Transferencia</button>
+      </div>
+    </div>
+
+    <!-- Info cuenta según método -->
+    <div class="info-pago" id="infoPago">
+      <strong>📱 SINPE Móvil:</strong> Enviá al número <strong>8888-8888</strong> (FaunaLink CR)<br>
+      Luego ingresá el número de comprobante que te genera el sistema.
+    </div>
+
+    <div class="v-form-group">
+      <label class="v-form-label">Monto donado (₡) *</label>
+      <input type="number" id="fMonto" class="v-form-control" placeholder="Ej: 5000" min="1">
+    </div>
+
+    <div class="v-form-group">
+      <label class="v-form-label">Número de comprobante *</label>
+      <input type="text" id="fComprobante" class="v-form-control" placeholder="Ej: 123456789">
+      <small style="color:var(--text-muted);font-size:0.75rem;">El número que te genera el banco o SINPE al realizar el pago.</small>
+    </div>
+
+    <div class="v-form-group">
+      <label class="v-form-label">Nota adicional (opcional)</label>
+      <textarea id="fDescripcion" class="v-form-control" placeholder="Ej: Para alimentos de animales rescatados…"></textarea>
+    </div>
+
+    <div class="v-form-actions">
+      <button class="v-btn v-btn-outline" onclick="cerrarModal()">Cancelar</button>
+      <button class="v-btn v-btn-primary" onclick="guardarDonacion()">Registrar donación</button>
+    </div>
+  </div>
+</div>
+
+<div class="v-toast-container" id="vToastContainer"></div>
+
+<script>
+  let donaciones  = [];
+  let metodoPago  = 'sinpe';
+  let usuarioActual = null;
+
+  const INFO_PAGO = {
+    sinpe: `<strong>📱 SINPE Móvil:</strong> Enviá al número <strong>8888-8888</strong> (FaunaLink CR)<br>Luego ingresá el número de comprobante que te genera el sistema.`,
+    transferencia: `<strong>🏦 Transferencia:</strong> Podés transferir a:<br>
+      &nbsp;&nbsp;• BAC San José — Cta: <strong>102-000-000000</strong><br>
+      &nbsp;&nbsp;• BCR — Cta: <strong>001-000-000000</strong><br>
+      Guardá el comprobante e ingresá el número de referencia.`
+  };
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const raw = localStorage.getItem('usuario');
+    if (raw) usuarioActual = JSON.parse(raw);
+    if (!usuarioActual?.id) return;
+    await cargar();
+  });
+
+  async function cargar() {
+    try {
+      const res = await fetch(`/api/donaciones/mis/${usuarioActual.id}`);
+      if (!res.ok) throw new Error();
+      donaciones = await res.json();
+      actualizarStats();
+      renderTabla(donaciones);
+    } catch (e) {
+      document.getElementById('donTabla').innerHTML = `
+        <tr><td colspan="6">
+          <div class="v-empty"><div class="e-icon">⚠️</div><p>No se pudieron cargar tus donaciones</p></div>
+        </td></tr>`;
+    }
+  }
+
+  function actualizarStats() {
+    const confirmadas = donaciones.filter(d => d.estado === 'confirmada');
+    const pendientes  = donaciones.filter(d => d.estado === 'pendiente');
+    const total       = confirmadas.reduce((s, d) => s + (d.monto || 0), 0);
+
+    document.getElementById('statTotal').textContent      = fmt(total);
+    document.getElementById('statCantidad').textContent   = donaciones.length;
+    document.getElementById('statConfirmadas').textContent = confirmadas.length;
+    document.getElementById('statPendientes').textContent  = pendientes.length;
+  }
+
+  function renderTabla(lista) {
+    const tbody = document.getElementById('donTabla');
+    if (!lista.length) {
+      tbody.innerHTML = `
+        <tr><td colspan="6">
+          <div class="v-empty">
+            <div class="e-icon">💝</div>
+            <p>Aún no has realizado ninguna donación.<br>¡Cada aporte hace la diferencia!</p>
+          </div>
+        </td></tr>`;
+      return;
+    }
+    tbody.innerHTML = lista.map(d => {
+      const fecha  = new Date(d.fecha).toLocaleDateString('es-CR');
+      const metodo = d.metodoPago === 'sinpe' ? 'sinpe' : 'transferencia';
+      const labelMetodo = d.metodoPago === 'sinpe' ? '📱 SINPE' : '🏦 Transferencia';
+      return `
+        <tr>
+          <td>${fecha}</td>
+          <td><span class="v-badge badge-${metodo}">${labelMetodo}</span></td>
+          <td style="font-family:monospace;font-size:0.85rem;">${d.comprobante || '—'}</td>
+          <td class="monto-val">${fmt(d.monto)}</td>
+          <td><span class="v-badge badge-${d.estado}">${d.estado.charAt(0).toUpperCase()+d.estado.slice(1)}</span></td>
+          <td><small style="color:var(--text-muted)">${d.descripcion ? d.descripcion.substring(0,40)+'…' : '—'}</small></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function filtrar() {
+    const q = document.getElementById('buscador').value.toLowerCase();
+    const e = document.getElementById('filtroEstado').value;
+    renderTabla(donaciones.filter(d =>
+      (!q || (d.comprobante||'').toLowerCase().includes(q) || (d.metodoPago||'').includes(q)) &&
+      (!e || d.estado === e)
+    ));
+  }
+
+  function seleccionarMetodo(metodo, btn) {
+    metodoPago = metodo;
+    document.querySelectorAll('.metodo-tab').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    document.getElementById('infoPago').innerHTML = INFO_PAGO[metodo];
+  }
+
+  function abrirModal() {
+    document.getElementById('modalDonacion').classList.add('active');
+  }
+  function cerrarModal() {
+    document.getElementById('modalDonacion').classList.remove('active');
+    ['fMonto','fComprobante','fDescripcion'].forEach(id => document.getElementById(id).value = '');
+    metodoPago = 'sinpe';
+    document.querySelectorAll('.metodo-tab').forEach((b,i) => b.classList.toggle('activo', i===0));
+    document.getElementById('infoPago').innerHTML = INFO_PAGO.sinpe;
+  }
+  document.getElementById('modalDonacion').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalDonacion')) cerrarModal();
+  });
+
+  async function guardarDonacion() {
+    const monto       = document.getElementById('fMonto').value;
+    const comprobante = document.getElementById('fComprobante').value.trim();
+
+    if (!monto || parseFloat(monto) <= 0) { showToast('Ingresá un monto válido', 'error'); return; }
+    if (!comprobante)                      { showToast('El número de comprobante es requerido', 'error'); return; }
+
+    try {
+      const res = await fetch('/api/donaciones/usuario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuarioId:    usuarioActual.id,
+          nombreDonante: usuarioActual.nombre,
+          monto:        parseFloat(monto),
+          metodoPago,
+          comprobante,
+          descripcion:  document.getElementById('fDescripcion').value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast('⚠️ ' + data.message, 'error'); return; }
+      cerrarModal();
+      showToast('✅ Donación registrada. Será verificada pronto.', 'success');
+      await cargar();
+    } catch (e) {
+      showToast('Error de conexión', 'error');
+    }
+  }
+
+  function copiar(texto) {
+    navigator.clipboard.writeText(texto).then(() => showToast('✅ Número copiado', 'success'));
+  }
+
+  function fmt(n) {
+    return '₡' + Number(n).toLocaleString('es-CR', { minimumFractionDigits: 0 });
+  }
+
+  function showToast(msg, tipo = 'success') {
+    const tc = document.getElementById('vToastContainer');
+    const t  = document.createElement('div');
+    t.className = `v-toast v-toast-${tipo}`;
+    t.textContent = msg;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+</script>
