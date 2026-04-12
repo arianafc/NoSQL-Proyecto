@@ -26,7 +26,7 @@ exports.registrarUsuario = async (req, res) => {
       cedula,
       password: hashedPassword,
       telefono,
-      rol: 'Usuario',
+      rol: 'usuario',
       estado: true
     });
 
@@ -171,7 +171,7 @@ exports.updateRol = async (req, res) => {
     const db = await connectDB();
     const { rol } = req.body;
 
-    const rolesValidos = ['Admin', 'Usuario', 'Organizacion'];
+    const rolesValidos = ['admin', 'usuario'];
 
     if (!rolesValidos.includes(rol)) {
       return res.status(400).json({ message: 'Rol inválido' });
