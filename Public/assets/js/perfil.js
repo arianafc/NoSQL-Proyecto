@@ -79,9 +79,28 @@ $('#activarVoluntariado').change(function() {
     console.log('Voluntariado activado');
     $("#formActualizarVoluntario").removeClass('d-none');
   } else {
-    console.log('Voluntariado desactivado');
-    $("#formActualizarVoluntario").addClass('d-none');
-}   
+  if (usuario.voluntario) {
+    $.ajax({
+      url: APIUsuario + 'NoVoluntario',
+      method: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        userId: usuario.id
+      }),
+      success: function (res) {
+        Swal.fire('Éxito', 'Voluntariado desactivado', 'success')
+          .then(() => {
+            usuario.voluntario = false;
+            localStorage.setItem('usuario', JSON.stringify(usuario));
+            location.reload();
+          });
+      },
+      error: function (err) {
+        Swal.fire('Error', 'No se pudo actualizar', 'error');
+      }
+    });
+  }
+}
 });
 
 
@@ -106,8 +125,6 @@ if (usuario.voluntario) {
 
 
 
-
-
 $("#formActualizarVoluntario").submit(function(e) {
     e.preventDefault();
 
@@ -124,22 +141,31 @@ $("#formActualizarVoluntario").submit(function(e) {
         return;
     }
 
-    $.ajax({
-        url: APIUsuario + 'voluntario',
-        method: 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          userId: usuario.id,
-            habilidades,
-            disponibilidad
-        }),
-        success: function(res) {
-            Swal.fire('Éxito', 'Ahora eres voluntario 🎉', 'success');
-        },
-        error: function(err) {
-            Swal.fire('Error', 'No se pudo actualizar', 'error');
-        }
-    });
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+$.ajax({
+  url: APIUsuario + 'voluntario',
+  method: 'PUT',
+  contentType: 'application/json',
+  data: JSON.stringify({
+    userId: usuario.id,
+    habilidades: habilidades,
+    disponibilidad: disponibilidad
+  }),
+  success: function (res) {
+
+    usuario.voluntario = true;
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+
+    Swal.fire('Éxito', 'Ahora eres voluntario 🎉', 'success')
+      .then(() => {
+        location.reload();
+      });
+  },
+  error: function () {
+    Swal.fire('Error', 'No se pudo actualizar', 'error');
+  }
+});
 });
 
 
